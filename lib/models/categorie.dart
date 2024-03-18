@@ -1,21 +1,21 @@
 class Categorie {
   final int id;
-  final String nom;
+  final String libelle;
 
   const Categorie({
     required this.id,
-    required this.nom,
+    required this.libelle,
   });
 
   Map<String, Object?> toMap() {
     return {
       'id': id,
-      'nom': nom,
+      'libelle': libelle,
     };
   }
 
   @override
   String toString() {
-    return 'Categorie{id: $id, nom: $nom}';
+    return 'Categorie{id: $id, libelle: $libelle}';
   }
 }

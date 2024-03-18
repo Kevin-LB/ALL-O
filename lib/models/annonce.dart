@@ -14,4 +14,20 @@ class Annonce {
     required this.dateFin,
     required this.img,
   });
+
+  Map<String, Object?> toMap() {
+    return {
+      'id': id,
+      'libelle': libelle,
+      'description': description,
+      'datePost': datePost,
+      'dateFin': dateFin,
+      'img': img,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'Annonce{id: $id, libelle: $libelle, description: $description, datePost: $datePost, dateFin: $dateFin, img: $img}';
+  }
 }
