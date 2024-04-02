@@ -3,16 +3,18 @@ class Annonce {
   final String libelle;
   final String description;
   final DateTime datePost;
-  final DateTime dateFin;
   final String img;
+  final int idB;
+  final int idU;
 
   const Annonce({
     required this.id,
     required this.libelle,
     required this.description,
     required this.datePost,
-    required this.dateFin,
     required this.img,
+    required this.idB,
+    required this.idU,
   });
 
   Map<String, Object?> toMap() {
@@ -21,13 +23,14 @@ class Annonce {
       'libelle': libelle,
       'description': description,
       'datePost': datePost,
-      'dateFin': dateFin,
       'img': img,
+      'idB': idB,
+      'idU': idU,
     };
   }
 
   @override
   String toString() {
-    return 'Annonce{id: $id, libelle: $libelle, description: $description, datePost: $datePost, dateFin: $dateFin, img: $img}';
+    return 'Annonce{id: $id, libelle: $libelle, description: $description, datePost: $datePost, img: $img, idB: $idB, idU: $idU}';
   }
 }

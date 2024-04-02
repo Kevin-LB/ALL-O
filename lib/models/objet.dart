@@ -4,6 +4,7 @@ class Biens {
   final String description;
   final String img;
   final bool pret;
+  final int idU;
 
   const Biens({
     required this.id,
@@ -11,6 +12,7 @@ class Biens {
     required this.description,
     required this.pret,
     required this.img,
+    required this.idU,
   });
 
   Map<String, Object?> toMap() {
@@ -20,11 +22,12 @@ class Biens {
       'description': description,
       "pret": pret,
       'img': img,
+      'idU': idU,
     };
   }
 
   @override
   String toString() {
-    return 'Biens{id: $id, libelle: $libelle, description: $description, img: $img}';
+    return 'Biens{id: $id, libelle: $libelle, description: $description, img: $img, pret: $pret, idU: $idU}';
   }
 }
