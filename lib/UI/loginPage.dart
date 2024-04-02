@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:allo/UI/SignUpPage.dart';
-import 'package:allo/UI/home.dart';
-import 'package:allo/main.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:allo/UI/SignUpPage.dart';
+import 'package:allo/UI/acceuil/home.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+final supabase = Supabase.instance.client;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

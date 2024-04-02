@@ -1,7 +1,11 @@
-import 'package:allo/UI/button.dart';
-import 'package:allo/UI/home.dart';
+// ignore_for_file: non_constant_identifier_names, no_leading_underscores_for_local_identifiers
+
+import 'package:allo/UI/Controller/button.dart';
+import 'package:allo/UI/acceuil/home.dart';
 import 'package:allo/db/alloDB.dart';
 import 'package:allo/models/categorie.dart';
+import 'package:allo/models/annonce.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,8 +15,8 @@ class PageAdd extends StatefulWidget {
 }
 
 class _PageAddState extends State<PageAdd> {
-  final Map<String, bool> _checkboxValues = {
-  };
+  final Map<String, bool> _checkboxValues = {};
+  String selectedCategories = "";
 
   final allDb = AllDB();
 
@@ -74,18 +78,26 @@ class _PageAddState extends State<PageAdd> {
   void onCheckboxChanged(String key, bool? newValue) {
     setState(() {
       _checkboxValues[key] = newValue!;
+      selectedCategories = _checkboxValues.entries
+          .where((element) => element.value)
+          .map((e) => e.key)
+          .join(', ');
     });
   }
 
   void navigateToHome(BuildContext context) {
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const Home()),
+      (Route<dynamic> route) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final _annonceController = TextEditingController();
+    final _descriptionController = TextEditingController();
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFF3C3838),
@@ -126,6 +138,7 @@ class _PageAddState extends State<PageAdd> {
                       width: 300,
                       color: const Color(0xFF8C8585),
                       child: TextFormField(
+                        controller: _annonceController,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: "Titre de l'annonce",
@@ -138,21 +151,30 @@ class _PageAddState extends State<PageAdd> {
                     ),
                   )),
               Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Center(
-                    child: Container(
-                      width: 300,
-                      height: 150,
-                      color: const Color(0xFF8C8585),
-                      child: TextFormField(
-                        maxLines: null,
-                        decoration: const InputDecoration(
-                          labelText: 'Description',
-                          border: OutlineInputBorder(),
-                        ),
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Center(
+                  child: Container(
+                    width: 300,
+                    height: 150,
+                    color: const Color(0xFF8C8585),
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: _descriptionController,
+                      maxLines: null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Veuillez entrer une description';
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                        border: InputBorder.none,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
               Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: Center(
@@ -160,26 +182,66 @@ class _PageAddState extends State<PageAdd> {
                       width: 300,
                       color: const Color(0xFF8C8585),
                       child: TextFormField(
+                        readOnly: true, // make the field read-only
+                        onTap: () {
+                          dialogBuilder(context, onCheckboxChanged);
+                        },
                         decoration: InputDecoration(
                           labelText: 'Catégorie',
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.more_vert),
-                            onPressed: () {
-                              dialogBuilder(context, onCheckboxChanged);
-                            },
-                          ),
+                          hintText: selectedCategories.isEmpty
+                              ? 'Sélectionnez une catégorie'
+                              : selectedCategories,
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
                   )),
               Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: ButtonSelect(
-                    text: "Valider",
-                    onPressed: () => navigateToHome(context),
-                    buttonColor: const Color(0xFFD9D9D9),
-                    textColor: const Color(0xff201D1D),
-                  )),
+                padding: const EdgeInsets.only(top: 10),
+                child: ButtonSelect(
+                  text: "Valider",
+                  onPressed: () async {
+                    final List<Annonce> annonceList = await allDb.annonces();
+                    if (annonceList.isEmpty) {
+                      String libelleAnnonce = _annonceController.text;
+                      String descriptionAnnonce = _descriptionController.text;
+
+                      final annonceInsert = Annonce(
+                        id: 1,
+                        libelle: libelleAnnonce,
+                        description: descriptionAnnonce,
+                        datePost: DateTime.now(),
+                        img: "default",
+                        idB: 1,
+                        idU: 1,
+                      );
+                      await allDb.insertAnnonce(annonceInsert);
+                      if (mounted) {
+                        navigateToHome(context);
+                      }
+                    } else {
+                      final id_annonce = annonceList.last.id + 1;
+                      String libelleAnnonce = _annonceController.text;
+                      String descriptionAnnonce = _descriptionController.text;
+                      final annonceInsert = Annonce(
+                        id: id_annonce,
+                        libelle: libelleAnnonce,
+                        description: descriptionAnnonce,
+                        datePost: DateTime.now(),
+                        img: "default",
+                        idB: 1,
+                        idU: 1,
+                      );
+                      await allDb.insertAnnonce(annonceInsert);
+                      if (mounted) {
+                        navigateToHome(context);
+                      }
+                    }
+                  },
+                  buttonColor: const Color(0xFFD9D9D9),
+                  textColor: const Color(0xff201D1D),
+                ),
+              ),
             ],
           ),
         ));

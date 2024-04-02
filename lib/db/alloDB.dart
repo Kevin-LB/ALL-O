@@ -1,13 +1,14 @@
-// ignore_for_file: unused_element
+// ignore_for_file: unused_element, await_only_futures
 
+import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:allo/models/annonce.dart';
 import 'package:allo/models/appartenirAnnonce.dart';
 import 'package:allo/models/appartenirBiens.dart';
 import 'package:allo/models/categorie.dart';
+import 'package:allo/models/concerner.dart';
 import 'package:allo/models/objet.dart';
-import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 
 // ignore: camel_case_types
 class AllDB extends ChangeNotifier {
@@ -55,7 +56,8 @@ class AllDB extends ChangeNotifier {
           datePost DATETIME, 
           img TEXT,
           idB INTEGER, 
-          FOREIGN KEY(idB) REFERENCES Biens(id)
+          idU INTEGER,
+          FOREIGN KEY(idB) REFERENCES Biens(id)    
         )
       ''');
 
@@ -89,6 +91,16 @@ class AllDB extends ChangeNotifier {
           FOREIGN KEY(idC) REFERENCES Categorie(id)
         )
       ''');
+
+        await db.execute('''
+        CREATE TABLE Concerner(
+          idA INTEGER, 
+          idB INTEGER,
+          PRIMARY KEY(idA, idB),
+          FOREIGN KEY(idA) REFERENCES Annonce(id),
+          FOREIGN KEY(idB) REFERENCES Biens(id)
+        )
+      ''');
       }
 
       var database = await openDatabase(path, version: 1, onCreate: _createDb);
@@ -97,6 +109,52 @@ class AllDB extends ChangeNotifier {
       print('Error occurred while initializing the database: $e');
       throw e;
     }
+  }
+
+  Future<void> deleteDb() async {
+    var databasesPath = await getDatabasesPath();
+    var path = join(databasesPath, 'allo.db');
+    await deleteDatabase(path);
+    _db = null;
+  }
+
+  Future<bool> concernerExists(int idA, int idB) async {
+    final _db = db;
+    final result = await (await _db)?.query('Concerner',
+            where: 'idA = ? AND idB = ?', whereArgs: [idA, idB]) ??
+        [];
+    return result.isNotEmpty;
+  }
+
+  Future<void> insertConcerner(Concerner concerner) async {
+    final db = await _db;
+    if (await concernerExists(concerner.idA, concerner.idB)) {
+      await db?.update(
+        'Concerner',
+        concerner.toMap(),
+        where: 'idA = ? AND idB = ?',
+        whereArgs: [concerner.idA, concerner.idB],
+      );
+    } else {
+      await db?.insert(
+        'Concerner',
+        concerner.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    notifyListeners();
+    refreshConcerner();
+  }
+
+  Future<List<Concerner>> concerners() async {
+    final db = await _db;
+    final List<Map<String, dynamic>> maps = await db!.query('Concerner');
+    return List.generate(maps.length, (i) {
+      return Concerner(
+        idA: maps[i]['idA'],
+        idB: maps[i]['idB'],
+      );
+    });
   }
 
   Future<bool> categorieExists(int id) async {
@@ -165,6 +223,9 @@ class AllDB extends ChangeNotifier {
     }
     notifyListeners();
     refreshAnnonces();
+    print('Annonce inserted');
+    final dbAnnonce = await annonces();
+    print(dbAnnonce);
   }
 
   Future<bool> biensExists(int id) async {
@@ -266,18 +327,40 @@ class AllDB extends ChangeNotifier {
 
   Future<List<Annonce>> annonces() async {
     final db = await _db;
-    final List<Map<String, dynamic>> maps = await db!.query('Annonce');
-    return List.generate(maps.length, (i) {
-      return Annonce(
-        id: maps[i]['id'],
-        libelle: maps[i]['libelle'],
-        description: maps[i]['description'],
-        datePost: maps[i]['datePost'],
-        img: maps[i]['img'],
-        idB: maps[i]['idB'],
-        idU: maps[i]['idU'],
-      );
-    });
+    if (db != null) {
+      final List<Map<String, dynamic>> maps = await db.query('Annonce');
+      print(maps);
+      return List.generate(maps.length, (i) {
+        return Annonce(
+          id: maps[i]['id'],
+          libelle: maps[i]['libelle'],
+          description: maps[i]['description'],
+          datePost: DateTime.parse(maps[i]['datePost']),
+          img: maps[i]['img'],
+          idB: maps[i]['idB'],
+          idU: maps[i]['idU'],
+        );
+      });
+    }
+    print('Database is null');
+
+    return [];
+  }
+
+  Future<Annonce> getAnnonce(int id) async {
+    Map<String, dynamic> maps = (await (await db)
+        ?.query('Annonce', where: 'id = ?', whereArgs: [id]))![0];
+
+    DateTime datePost = DateTime.parse(maps['datePost']);
+    return Annonce(
+      id: maps['id'],
+      libelle: maps['libelle'],
+      description: maps['description'],
+      datePost: datePost,
+      img: maps['img'],
+      idB: maps['idB'],
+      idU: maps['idU'],
+    );
   }
 
   Future<List<Biens>> biens() async {
@@ -368,11 +451,22 @@ class AllDB extends ChangeNotifier {
     notifyListeners();
   }
 
+  void refreshConcerner() async {
+    listeappartenirBiens = [];
+    appartenirBiens().then((List<Appartenir_Biens> value) {
+      for (Appartenir_Biens appartenirBiens in value) {
+        listeappartenirBiens.add(appartenirBiens);
+      }
+    });
+    notifyListeners();
+  }
+
   void refreshAll() {
     refreshCategories();
     refreshAnnonces();
     refreshBiens();
     refreshAppartenirAnnonces();
     refreshAppartenirBiens();
+    refreshConcerner();
   }
 }

@@ -1,7 +1,5 @@
 // ignore_for_file: unnecessary_import, unused_import
 
-import 'package:allo/UI/home.dart';
-import 'package:allo/db/alloDB.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -9,6 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:provider/provider.dart';
+import 'package:allo/UI/acceuil/home.dart';
+import 'package:allo/db/alloDB.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSwatch()
               .copyWith(background: const Color(0xFF3C3838)),
         ),
-        home: Home(),
+        home: const Home(),
       ),
     );
   }

@@ -1,37 +1,50 @@
-import 'package:allo/UI/bottomNavBar.dart';
-import 'package:allo/UI/button.dart';
-import 'package:allo/UI/pageAdd.dart';
-import 'package:allo/UI/pageMenu.dart';
-import 'package:allo/UI/pageSearch.dart';
-import 'package:allo/UI/pagepret.dart';
-import 'package:allo/main.dart';
+// ignore_for_file: must_be_immutable
+
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:allo/UI/Controller/bottomNavBar.dart';
+import 'package:allo/UI/Controller/button.dart';
+import 'package:allo/UI/acceuil/detailAnnonce.dart';
+import 'package:allo/UI/pageAdd.dart';
+import 'package:allo/UI/menuPage/pageMenu.dart';
+import 'package:allo/UI/pageSearch.dart';
+import 'package:allo/UI/acceuil/pagepret.dart';
+import 'package:allo/UI/acceuil/settingsPage.dart';
+import 'package:allo/db/alloDB.dart';
+import 'package:allo/models/annonce.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
 }
 
+final supabase = Supabase.instance.client;
+
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
   Session? _session;
+  Future<List<Annonce>>? annoncesFuture;
+  Future<Database?> db = AllDB().db;
 
   @override
   void initState() {
     super.initState();
     _getSession();
+    annoncesFuture = db.then((value) => AllDB().annonces());
   }
 
   Future<void> _getSession() async {
     try {
       await Future.delayed(Duration.zero);
       if (supabase.auth.currentSession != null) {
-        print('User is authenticated');
+        print('User est authentifié');
       } else {
-        print('User is not authenticated');
+        print("User n'est pas authentifié");
       }
       if (!mounted) {
         return;
@@ -51,7 +64,9 @@ class _HomeState extends State<Home> {
       case 3:
         return const PageMenu();
       default:
-        return const HomeScreen();
+        return HomeScreen(
+          annonces: annoncesFuture,
+        );
     }
   }
 
@@ -74,7 +89,9 @@ class _HomeState extends State<Home> {
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  late Future<List<Annonce>>? annonces;
+
+  HomeScreen({super.key, required this.annonces});
 
   void navigateToPage2(BuildContext context) {
     Navigator.push(
@@ -106,13 +123,23 @@ class HomeScreen extends StatelessWidget {
                   text: "'llo",
                   style: TextStyle(
                     color: Color(0xffFFFFFF),
-                    fontSize: 30.0,
                   ),
                 ),
               ],
             ),
           ),
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Container(
         color: const Color(0xFF3C3838),
@@ -135,20 +162,52 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: 20,
-                itemBuilder: (BuildContext context, int index) {
-                  String status = getStatus(index);
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: _buildContainer(status),
-                      ),
-                      Expanded(
-                        child: _buildContainer(status),
-                      ),
-                    ],
-                  );
+              child: FutureBuilder<List<Annonce>>(
+                future: annonces,
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<Annonce>> snapshot) {
+                  try {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return Text('Erreur : ${snapshot.error}');
+                    } else if (snapshot.hasData && snapshot.data != null) {
+                      return GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                        ),
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          Annonce? annonce = snapshot.data![index];
+                          if (annonce != null) {
+                            String? status = getStatus(index);
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        DetailPage(annonce: annonce),
+                                  ),
+                                );
+                              },
+                              child: _buildContainer(annonce, status),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      );
+                    } else {
+                      return const Text("Aucune annonce disponible");
+                    }
+                  } catch (e) {
+                    print(e);
+                    return const Text(
+                        "Erreur lors de la récupération des annonces");
+                  }
                 },
               ),
             ),
@@ -158,7 +217,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContainer(String status) {
+  Widget _buildContainer(Annonce annonce, String status) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFD9D9D9),
@@ -181,18 +240,18 @@ class HomeScreen extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
               const SizedBox(width: 10.0),
-              const Flexible(
+              Flexible(
                 child: Text(
-                  'clous',
-                  style: TextStyle(
+                  annonce.libelle,
+                  style: const TextStyle(
                     color: Color(0xFF000000),
                     fontSize: 15.0,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10.0),
           Container(
             height: 35.0,
             width: 80,

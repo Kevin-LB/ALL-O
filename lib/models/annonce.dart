@@ -22,7 +22,7 @@ class Annonce {
       'id': id,
       'libelle': libelle,
       'description': description,
-      'datePost': datePost,
+      'datePost': datePost.toIso8601String(),
       'img': img,
       'idB': idB,
       'idU': idU,

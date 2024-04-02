@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+final supabase = Supabase.instance.client;
 
 class CreationComptePage extends StatefulWidget {
   const CreationComptePage({Key? key}) : super(key: key);
@@ -106,11 +109,33 @@ class _CreationComptePageState extends State<CreationComptePage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  final sm = ScaffoldMessenger.of(context as BuildContext);
                   // ignore: avoid_print
                   print('Email: ${_emailController.text}');
                   // ignore: avoid_print
                   print('Password: ${_passwordController.text}');
+                  try {
+                    final authResponse = await supabase.auth.signUp(
+                        email: _emailController.text,
+                        password: _passwordController.text);
+
+                    sm.showSnackBar(SnackBar(
+                      content: Text(
+                          "L'utilisateur est inscrit ${authResponse.user!.email}"),
+                    ));
+                  } on AuthException catch (e) {
+                    if (e.message == 'Email rate limit exceeded') {
+                      sm.showSnackBar(const SnackBar(
+                        content: Text(
+                            "Email rate limit exceeded. Please try again later."),
+                      ));
+                    } else {
+                      sm.showSnackBar(SnackBar(
+                        content: Text("Erreur: ${e.message}"),
+                      ));
+                    }
+                  }
                 },
                 child: const Text("S'inscrire")),
           ),
