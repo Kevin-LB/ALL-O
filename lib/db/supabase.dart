@@ -75,7 +75,7 @@ class SupabaseDB {
 
     if (response == null) {
       print('Erreur lors de la récupération des annonces: la réponse est null');
-      return []; // Retourne une liste vide en cas d'erreur
+      return []; 
     } else {
       print('Annonces récupérées avec succès: ${response}');
       return response.map((data) => Annonce.fromMap(data)).toList();
