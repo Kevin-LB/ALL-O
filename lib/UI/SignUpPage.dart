@@ -1,3 +1,4 @@
+import 'package:allo/db/supabase.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,6 +16,7 @@ class _CreationComptePageState extends State<CreationComptePage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
 
   @override
   Widget build(Object context) {
@@ -83,6 +85,19 @@ class _CreationComptePageState extends State<CreationComptePage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              controller: _usernameController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Username',
+                labelStyle: TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 0.5),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
               controller: _emailController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -109,35 +124,65 @@ class _CreationComptePageState extends State<CreationComptePage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-                onPressed: () async {
-                  final sm = ScaffoldMessenger.of(context as BuildContext);
-                  // ignore: avoid_print
-                  print('Email: ${_emailController.text}');
-                  // ignore: avoid_print
-                  print('Password: ${_passwordController.text}');
+              onPressed: () async {
+                final sm = ScaffoldMessenger.of(context as BuildContext);
+                if (_emailController.text.isNotEmpty &&
+                    _passwordController.text.isNotEmpty) {
                   try {
-                    final authResponse = await supabase.auth.signUp(
-                        email: _emailController.text,
-                        password: _passwordController.text);
+                    final userExists = await SupabaseDB.verifyUser(
+                      _emailController.text,
+                      _passwordController.text,
+                    );
 
-                    sm.showSnackBar(SnackBar(
-                      content: Text(
-                          "L'utilisateur est inscrit ${authResponse.user!.email}"),
-                    ));
-                  } on AuthException catch (e) {
-                    if (e.message == 'Email rate limit exceeded') {
-                      sm.showSnackBar(const SnackBar(
-                        content: Text(
-                            "Email rate limit exceeded. Please try again later."),
-                      ));
+                    print('User exists: $userExists');
+
+                    if (userExists) {
+                      sm.showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "L'utilisateur existe déjà",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      );
                     } else {
-                      sm.showSnackBar(SnackBar(
-                        content: Text("Erreur: ${e.message}"),
-                      ));
+                      await SupabaseDB.insertUser(
+                        nom: _surnameController.text,
+                        prenom: _nameController.text,
+                        username: _usernameController.text.trim(),
+                        email: _emailController.text.trim(),
+                        password: _passwordController.text.trim(),
+                      );
+
+                      sm.showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text("L'utilisateur est inscrit avec succès"),
+                        ),
+                      );
                     }
+                  } catch (error, stackTrace) {
+                    print('Error: $error');
+                    print('Stack trace: $stackTrace');
+                    sm.showSnackBar(
+                      const SnackBar(
+                        content: Text("Erreur lors de l'inscription"),
+                      ),
+                    );
                   }
-                },
-                child: const Text("S'inscrire")),
+                } else {
+                  sm.showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        "Veuillez remplir tous les champs",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: const Text("S'inscrire"),
+            ),
           ),
         ],
       ),

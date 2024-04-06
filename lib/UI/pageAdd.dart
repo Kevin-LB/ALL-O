@@ -205,7 +205,8 @@ class _PageAddState extends State<PageAdd> {
                     if (annonceList.isEmpty) {
                       String libelleAnnonce = _annonceController.text;
                       String descriptionAnnonce = _descriptionController.text;
-
+                      print("libelleAnnonce: $libelleAnnonce");
+                      print("descriptionAnnonce: $descriptionAnnonce");
                       final annonceInsert = Annonce(
                         id: 1,
                         libelle: libelleAnnonce,

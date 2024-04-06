@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_import, unused_import
 
+import 'package:allo/db/supabase.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -17,18 +18,13 @@ Future<void> main() async {
   final AllDB databaseHelper = AllDB();
 
   try {
-    await Supabase.initialize(
-        url: "https://fidkenkusmgixuzuhwit.supabase.co",
-        anonKey:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZGtlbmt1c21naXh1enVod2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNDE3NTAsImV4cCI6MjAyNTkxNzc1MH0.vbvMxUNhGCsKr9ryl6MvRlHJ-cXQb-AC7zEwUBQmH7I");
+    SupabaseDB.init();
     final db = await databaseHelper.initDb();
     runApp(MyApp(db));
   } catch (e) {
     print('Failed to initialize the database: $e');
   }
 }
-
-final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   final Database database;

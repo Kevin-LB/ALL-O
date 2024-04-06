@@ -228,6 +228,25 @@ class AllDB extends ChangeNotifier {
     print(dbAnnonce);
   }
 
+  Future<void> updateAnnonce(Annonce annonce) async {
+    try {
+      final db = await _db;
+      if (db == null) {
+        print('Database is null');
+        return;
+      }
+      await db.update(
+        'Annonce',
+        annonce.toMap(),
+        where: 'id = ?',
+        whereArgs: [annonce.id],
+      );
+      print('Annonce updated');
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<bool> biensExists(int id) async {
     final _db = db;
     final result =

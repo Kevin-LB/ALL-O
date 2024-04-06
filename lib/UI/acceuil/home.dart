@@ -1,9 +1,11 @@
-// ignore_for_file: must_be_immutable
-
+// Importez les bibliothèques nécessaires
 import 'dart:async';
-
+import 'package:allo/UI/SignUpPage.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:allo/UI/acceuil/brouillons.dart';
+import 'package:allo/db/supabase.dart';
 import 'package:allo/UI/Controller/bottomNavBar.dart';
 import 'package:allo/UI/Controller/button.dart';
 import 'package:allo/UI/acceuil/detailAnnonce.dart';
@@ -14,7 +16,6 @@ import 'package:allo/UI/acceuil/pagepret.dart';
 import 'package:allo/UI/acceuil/settingsPage.dart';
 import 'package:allo/db/alloDB.dart';
 import 'package:allo/models/annonce.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -22,8 +23,6 @@ class Home extends StatefulWidget {
   @override
   State<Home> createState() => _HomeState();
 }
-
-final supabase = Supabase.instance.client;
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
@@ -35,7 +34,10 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _getSession();
-    annoncesFuture = db.then((value) => AllDB().annonces());
+    selectUser();
+    SupabaseDB.selectAnnonces().then((_) {
+      setState(() {});
+    });
   }
 
   Future<void> _getSession() async {
@@ -52,6 +54,25 @@ class _HomeState extends State<Home> {
       setState(() {});
     } catch (e) {
       print('Failed to get session: $e');
+    }
+  }
+
+  void loadAnnonces() async {
+    annoncesFuture = SupabaseDB.selectAnnonces();
+    setState(() {});
+  }
+
+  Future<void> selectUser() async {
+    final response = await supabase.from('utilisateur').select();
+    print('response: ${response}');
+
+    if (response == null) {
+      print(
+          'Erreur lors de la récupération de l\'utilisateur: la réponse est null');
+    } else if (response != null) {
+      print('Erreur lors de la récupération de l\'utilisateur: ');
+    } else {
+      print('Utilisateur récupéré avec succès: ${response}');
     }
   }
 
@@ -89,14 +110,21 @@ class _HomeState extends State<Home> {
 }
 
 class HomeScreen extends StatelessWidget {
-  late Future<List<Annonce>>? annonces;
+  final Future<List<Annonce>>? annonces;
 
-  HomeScreen({super.key, required this.annonces});
+  HomeScreen({Key? key, required this.annonces}) : super(key: key);
 
   void navigateToPage2(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => MyLoansPage()),
+    );
+  }
+
+  void navigateToBrouillon(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BrouillonsPage()),
     );
   }
 
@@ -151,6 +179,10 @@ class HomeScreen extends StatelessWidget {
               text: "Mes Prêts",
               onPressed: () => navigateToPage2(context),
             ),
+            ButtonSelect(
+              text: "Brouillons",
+              onPressed: () => navigateToBrouillon(context),
+            ),
             const Padding(
               padding: EdgeInsets.only(top: 20.0),
               child: Text(
@@ -166,47 +198,41 @@ class HomeScreen extends StatelessWidget {
                 future: annonces,
                 builder: (BuildContext context,
                     AsyncSnapshot<List<Annonce>> snapshot) {
-                  try {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      print(snapshot.error);
-                      return Text('Erreur : ${snapshot.error}');
-                    } else if (snapshot.hasData && snapshot.data != null) {
-                      return GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                        ),
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          Annonce? annonce = snapshot.data![index];
-                          if (annonce != null) {
-                            String? status = getStatus(index);
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DetailPage(annonce: annonce),
-                                  ),
-                                );
-                              },
-                              child: _buildContainer(annonce, status),
-                            );
-                          } else {
-                            return Container();
-                          }
-                        },
-                      );
-                    } else {
-                      return const Text("Aucune annonce disponible");
-                    }
-                  } catch (e) {
-                    print(e);
-                    return const Text(
-                        "Erreur lors de la récupération des annonces");
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    print(snapshot.error);
+                    return Text('Erreur : ${snapshot.error}');
+                  } else if (snapshot.hasData && snapshot.data != null) {
+                    return GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                      ),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Annonce? annonce = snapshot.data![index];
+                        if (annonce != null) {
+                          String? status = getStatus(index);
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DetailPage(annonce: annonce),
+                                ),
+                              );
+                            },
+                            child: _buildContainer(annonce, status),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    );
+                  } else {
+                    return const Text("Aucune annonce disponible");
                   }
                 },
               ),

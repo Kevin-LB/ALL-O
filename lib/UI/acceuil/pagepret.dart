@@ -19,7 +19,7 @@ class MyLoansPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mes prêts'),
+        title: const Text('Mes prêts'),
       ),
       body: ListView.builder(
         itemCount: loans.length,

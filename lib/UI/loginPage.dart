@@ -1,13 +1,12 @@
 import 'dart:async';
 
+import 'package:allo/db/supabase.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/UI/SignUpPage.dart';
 import 'package:allo/UI/acceuil/home.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-final supabase = Supabase.instance.client;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,28 +18,17 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  late final StreamSubscription<AuthState> _authStateSubscription;
 
   @override
   void initState() {
     super.initState();
-    _authStateSubscription = supabase.auth.onAuthStateChange.listen((event) {
-      final session = event.session;
-      if (session != null) {
-        Navigator.pushAndRemoveUntil(
-            // ignore: use_build_context_synchronously
-            context,
-            MaterialPageRoute(builder: (context) => const Home()),
-            (route) => false);
-      }
-    });
+  
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _authStateSubscription.cancel();
     super.dispose();
   }
 
@@ -107,21 +95,20 @@ class _LoginPageState extends State<LoginPage> {
           ElevatedButton(
             onPressed: () async {
               try {
-                final response = await supabase.auth.signInWithPassword(
-                  email: _emailController.text,
-                  password: _passwordController.text,
-                );
+                final response = await SupabaseDB.verifyUser(
+                    _emailController.text, _passwordController.text);
 
-                if (response.user == null) {
+
+                if (response) {
+                  print("Vous êtes connecté");
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Home()),
+                    (route) => false,
+                  );
+                } else {
                   print("Erreur lors de l'authentification");
                 }
-                print('User: ${response.user}');
-                print("Vous êtes connecté");
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Home()),
-                  (route) => false,
-                );
               } catch (error, stackTrace) {
                 print("l'email est: ${_emailController.text}");
                 print("le mot de passe est: ${_passwordController.text}");
@@ -141,8 +128,8 @@ class _LoginPageState extends State<LoginPage> {
                   print("l'email est: ${_emailController.text}");
                   print("le mot de passe est: ${_passwordController.text}");
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Une erreur s'est produite: $error"),
+                    const SnackBar(
+                      content: Text("Mauvais email ou mot de passe"),
                       backgroundColor: Colors.red,
                     ),
                   );
