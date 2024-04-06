@@ -29,6 +29,7 @@ class _HomeState extends State<Home> {
   Session? _session;
   Future<List<Annonce>>? annoncesFuture;
   Future<Database?> db = AllDB().db;
+  final supabase = Supabase.instance.client;
 
   @override
   void initState() {
