@@ -212,7 +212,6 @@ class _PageAddState extends State<PageAdd> {
                         libelle: libelleAnnonce,
                         description: descriptionAnnonce,
                         datePost: DateTime.now(),
-                        img: "default",
                         idB: 1,
                         idU: 1,
                       );
@@ -229,7 +228,6 @@ class _PageAddState extends State<PageAdd> {
                         libelle: libelleAnnonce,
                         description: descriptionAnnonce,
                         datePost: DateTime.now(),
-                        img: "default",
                         idB: 1,
                         idU: 1,
                       );

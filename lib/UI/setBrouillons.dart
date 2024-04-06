@@ -83,7 +83,9 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                         ElevatedButton(
                           child: const Text('Envoyer à Supabase'),
                           onPressed: () async {
+                            print('Envoi à Supabase');
                             if (_formKey.currentState!.validate()) {
+                              await SupabaseDB.selectBien_v2();
                               var response = await SupabaseDB.selectBiens(
                                   widget.annonce.idB);
                               if (response != null && response.isNotEmpty) {
@@ -92,6 +94,13 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                                   description: _descriptionController.text,
                                   idUser: widget.annonce.idU,
                                   idBiens: widget.annonce.idB,
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content:
+                                        Text("Votre annonce a été publiée"),
+                                    backgroundColor: Colors.green,
+                                  ),
                                 );
                               } else {
                                 print(

@@ -3,7 +3,6 @@ class Annonce {
   late String libelle;
   late String description;
   final DateTime datePost;
-  final String img;
   final int idB;
   final int idU;
 
@@ -12,7 +11,6 @@ class Annonce {
     required this.libelle,
     required this.description,
     required this.datePost,
-    required this.img,
     required this.idB,
     required this.idU,
   });
@@ -23,7 +21,6 @@ class Annonce {
       'libelle': libelle,
       'description': description,
       'datePost': datePost.toIso8601String(),
-      'img': img,
       'idB': idB,
       'idU': idU,
     };
@@ -31,18 +28,26 @@ class Annonce {
 
   @override
   String toString() {
-    return 'Annonce{id: $id, libelle: $libelle, description: $description, datePost: $datePost, img: $img, idB: $idB, idU: $idU}';
+    return 'Annonce{id: $id, libelle: $libelle, description: $description, datePost: $datePost, idB: $idB, idU: $idU}';
   }
 
   factory Annonce.fromMap(Map<String, dynamic> map) {
+    if (map['idA'] == null ||
+        map['libelleA'] == null ||
+        map['descriptionA'] == null ||
+        map['datePost'] == null ||
+        map['idB'] == null ||
+        map['idU'] == null) {
+      throw Exception('Missing key in map');
+    }
+
     return Annonce(
-      id: map['id'] as int,
-      libelle: map['libelle'] as String,
-      description: map['description'] as String,
+      id: map['idA'] as int ?? 0,
+      libelle: map['libelleA'] as String ?? '',
+      description: map['descriptionA'] as String ?? '',
       datePost: DateTime.parse(map['datePost'] as String),
-      img: map['img'] as String,
-      idB: map['idB'] as int,
-      idU: map['idU'] as int,
+      idB: map['idB'] as int ?? 0,
+      idU: map['idU'] as int ?? 0,
     );
   }
 }

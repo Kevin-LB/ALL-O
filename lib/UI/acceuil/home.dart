@@ -35,9 +35,7 @@ class _HomeState extends State<Home> {
     super.initState();
     _getSession();
     selectUser();
-    SupabaseDB.selectAnnonces().then((_) {
-      setState(() {});
-    });
+    loadAnnonces();
   }
 
   Future<void> _getSession() async {
@@ -59,6 +57,7 @@ class _HomeState extends State<Home> {
 
   void loadAnnonces() async {
     annoncesFuture = SupabaseDB.selectAnnonces();
+    print('Annonces FININI: ${annoncesFuture}');
     setState(() {});
   }
 
@@ -85,9 +84,7 @@ class _HomeState extends State<Home> {
       case 3:
         return const PageMenu();
       default:
-        return HomeScreen(
-          annonces: annoncesFuture,
-        );
+        return HomeScreen();
     }
   }
 
@@ -109,10 +106,28 @@ class _HomeState extends State<Home> {
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  final Future<List<Annonce>>? annonces;
+class HomeScreen extends StatefulWidget {
+  HomeScreen({Key? key}) : super(key: key);
 
-  HomeScreen({Key? key, required this.annonces}) : super(key: key);
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Future<List<Annonce>>? annonces;
+
+  @override
+  void initState() {
+    super.initState();
+    loadAnnonces();
+  }
+
+  void loadAnnonces() async {
+    List<Annonce> annoncesList = await SupabaseDB.selectAnnonces();
+    print('Annonces FININI: $annoncesList');
+    annonces = Future.value(annoncesList);
+    setState(() {});
+  }
 
   void navigateToPage2(BuildContext context) {
     Navigator.push(
@@ -158,6 +173,14 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              // Mettez ici le code pour rafraîchir vos données
+              // Par exemple, vous pouvez appeler à nouveau loadAnnonces()
+              loadAnnonces();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {

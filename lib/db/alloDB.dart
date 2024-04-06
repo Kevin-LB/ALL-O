@@ -54,7 +54,6 @@ class AllDB extends ChangeNotifier {
           libelle TEXT, 
           description TEXT, 
           datePost DATETIME, 
-          img TEXT,
           idB INTEGER, 
           idU INTEGER,
           FOREIGN KEY(idB) REFERENCES Biens(id)    
@@ -355,7 +354,6 @@ class AllDB extends ChangeNotifier {
           libelle: maps[i]['libelle'],
           description: maps[i]['description'],
           datePost: DateTime.parse(maps[i]['datePost']),
-          img: maps[i]['img'],
           idB: maps[i]['idB'],
           idU: maps[i]['idU'],
         );
@@ -376,7 +374,6 @@ class AllDB extends ChangeNotifier {
       libelle: maps['libelle'],
       description: maps['description'],
       datePost: datePost,
-      img: maps['img'],
       idB: maps['idB'],
       idU: maps['idU'],
     );

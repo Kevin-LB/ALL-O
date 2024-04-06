@@ -63,22 +63,27 @@ class SupabaseDB {
         "idB": idBiens
       }
     ]);
+    print('Annonce insérée avec succès');
   }
 
-  static PostgrestTransformBuilder<PostgrestMap> selectBiens(int idBiens) {
-    return supabase.from('Biens').select().eq('id', idBiens).single();
+  static PostgrestFilterBuilder<PostgrestList> selectBiens(int idBiens) {
+    return supabase.from('biens').select().eq('idB', idBiens);
+  }
+
+  static Future<void> selectBien_v2() async {
+    final reponse = await supabase.from('biens').select();
+    print('response: ${reponse}');
   }
 
   static Future<List<Annonce>> selectAnnonces() async {
     final response = await supabase.from('annonce').select();
     print('response: ${response}');
 
-    if (response == null) {
-      print('Erreur lors de la récupération des annonces: la réponse est null');
-      return []; 
-    } else {
-      print('Annonces récupérées avec succès: ${response}');
-      return response.map((data) => Annonce.fromMap(data)).toList();
+    List<Annonce> annonces = [];
+    for (var annonce in response) {
+      annonces.add(Annonce.fromMap(annonce));
     }
+    print('Annonces: ${annonces}');
+    return annonces;
   }
 }
