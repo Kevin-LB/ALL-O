@@ -4,50 +4,72 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseDB {
   static Future<void> init() async {
     await Supabase.initialize(
-        url: "https://fidkenkusmgixuzuhwit.supabase.co",
-        anonKey:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZGtlbmt1c21naXh1enVod2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNDE3NTAsImV4cCI6MjAyNTkxNzc1MH0.vbvMxUNhGCsKr9ryl6MvRlHJ-cXQb-AC7zEwUBQmH7I");
+      url: "https://fidkenkusmgixuzuhwit.supabase.co",
+      anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZGtlbmt1c21naXh1enVod2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNDE3NTAsImV4cCI6MjAyNTkxNzc1MH0.vbvMxUNhGCsKr9ryl6MvRlHJ-cXQb-AC7zEwUBQmH7I",
+    );
   }
 
   static final supabase = Supabase.instance.client;
 
-  static Future<void> insertUser(
-      {required String nom,
-      required String prenom,
-      required String username,
-      required String email,
-      required String password}) async {
-    await supabase.from('utilisateur').insert([
-      {
-        'nom': nom,
-        'prenom': prenom,
-        "username": username,
-        "password": password,
-        'email': email,
-      }
-    ]);
+  static Future<void> insertUser({
+    required String nom,
+    required String prenom,
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await supabase.from('utilisateur').insert([
+        {
+          'nom': nom,
+          'prenom': prenom,
+          'username': username,
+          'password': password,
+          'email': email,
+        }
+      ]);
+    } catch (error) {
+      print('Erreur lors de l\'insertion de l\'utilisateur: $error');
+      rethrow;
+    }
   }
+
+  static Future<bool> verifyUser(String email, String username) async {
+    try {
+      final query = supabase.from('utilisateur').select('email, username');
+
+      query.eq('email', email);
+      query.eq('username', username);
+
+      final response = await query.execute();
+
+      if (response.error != null) {
+        print('Erreur lors de la récupération des utilisateurs: ${response.error}');
+        return false;
+      }
+
+      final List<Map<String, dynamic>> users = response.data as List<Map<String, dynamic>>;
+
+      if (users.isNotEmpty) {
+        print("L'email ou le nom d'utilisateur est déjà utilisé");
+        return false;
+      }
+
+      print("L'utilisateur et l'email sont disponibles");
+      return true;
+    } catch (error) {
+      print('Erreur lors de la vérification de l\'utilisateur: $error');
+      return false;
+    }
+  }
+
+
+
+
 
   static Future<void> selectUser() async {
     final response = await supabase.from('utilisateur').select();
     print('response: ${response}');
-  }
-
-  static Future<bool> verifyUser(String email, String password) async {
-    final response = await supabase
-        .from('utilisateur')
-        .select('password')
-        .eq('email', email)
-        .single();
-
-    print('laresponseest: ${response}');
-
-    if (response != null) {
-      final userPassword = response['password'] as String;
-      return userPassword == password;
-    } else {
-      return false;
-    }
   }
 
   static Future<void> insertAnnonce(
