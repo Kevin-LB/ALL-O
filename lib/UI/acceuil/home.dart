@@ -1,4 +1,3 @@
-// Importez les bibliothèques nécessaires
 import 'dart:async';
 import 'package:allo/UI/acceuil/biensPage.dart';
 import 'package:allo/models/categorie.dart';

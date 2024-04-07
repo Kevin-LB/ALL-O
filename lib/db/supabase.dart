@@ -115,14 +115,22 @@ class SupabaseDB {
     print('Appartenir inséré avec succès');
   }
 
-  static PostgrestFilterBuilder<PostgrestList> selectBiens(int idBiens) {
+  static Future<void> selectBiens() async {
+    final reponse = await supabase.from('biens').select();
+    print('response: ${reponse}');
+  }
+
+  static PostgrestFilterBuilder<PostgrestList> selectBiensByIdBiens(
+      int idBiens) {
     print('idBiens: ${idBiens}');
     return supabase.from('biens').select().eq('idB', idBiens);
   }
 
-  static Future<void> selectBien_v2() async {
-    final reponse = await supabase.from('biens').select();
-    print('response: ${reponse}');
+  static Future<List<Map<String, dynamic>>> selectBiensByIDAnnonce(
+      int idUser) async {
+    final response = await supabase.from('biens').select().eq('idU', idUser);
+    print("response: $response");
+    return response;
   }
 
   static Future<void> updateBiens(Biens biens) async {
@@ -186,5 +194,23 @@ class SupabaseDB {
         .select()
         .eq('idC', idCategorie)
         .then((res) => res);
+  }
+
+  static Future<void> insertPreter(
+      int idUtilisateur, int idBiens, DateTime? dateSelectionner) async {
+    print(
+        'idUtilisateur: $idUtilisateur, idBiens: $idBiens, dateSelectionner: $dateSelectionner');
+    try {
+      var response = await supabase.from('preter').insert([
+        {
+          'idU': idUtilisateur,
+          'idB': idBiens,
+          "etat": "en cours",
+          "date_fin": dateSelectionner?.toIso8601String()
+        }
+      ]);
+    } catch (e) {
+      print('Erreur lors de l\'insertion : $e');
+    }
   }
 }

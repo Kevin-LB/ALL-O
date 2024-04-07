@@ -32,6 +32,8 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
   Future<void> loadAppartenirAnnonces() async {
     List<Appartenir_Annonce> appartenirAnnonces =
         await AllDB().appartenirAnnonceByID(widget.annonce.id);
+
+    print('id appartenirAnnonces : $appartenirAnnonces');
     setState(() {
       listeAppartenirAnnonce = appartenirAnnonces;
     });
@@ -110,8 +112,7 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                           onPressed: () async {
                             print('Envoi à Supabase');
                             if (_formKey.currentState!.validate()) {
-                              await SupabaseDB.selectBien_v2();
-                              var response = await SupabaseDB.selectBiens(
+                              var response = await SupabaseDB.selectBiensByIdBiens(
                                   widget.annonce.idB);
                               if (response.isNotEmpty) {
                                 await SupabaseDB.insertAnnonce(
@@ -163,7 +164,6 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
 
     Annonce annonceAValider = annonces.first;
 
-    // Insérer l'annonce dans Supabase
     await SupabaseDB.insertAnnonce(
       titre: annonceAValider.libelle,
       description: annonceAValider.description,

@@ -1,12 +1,38 @@
+import 'package:allo/UI/calendrier.dart';
+import 'package:allo/db/supabase.dart';
+import 'package:allo/models/objet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:allo/UI/Controller/button.dart';
 import 'package:allo/models/annonce.dart';
 
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
   final Annonce annonce;
-
   DetailPage({required this.annonce});
+
+  @override
+  State<DetailPage> createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  List<Biens> mesBiens = [];
+  List<Biens> aPreter = [];
+  DateTime? maDateSelectionnee;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBiens();
+  }
+
+  Future<void> fetchBiens() async {
+    var biens = await SupabaseDB.selectBiensByIDAnnonce(widget.annonce.idU);
+    for (var bienMap in biens) {
+      var bien = Biens.fromMap(bienMap);
+      mesBiens.add(bien);
+    }
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +79,7 @@ class DetailPage extends StatelessWidget {
                   width: 50,
                 ),
                 Text(
-                  annonce.libelle,
+                  widget.annonce.libelle,
                   style: const TextStyle(
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
@@ -66,7 +92,7 @@ class DetailPage extends StatelessWidget {
               height: 30,
             ),
             Text(
-              annonce.description,
+              widget.annonce.description,
               style: const TextStyle(
                 fontSize: 15,
                 color: Colors.white,
@@ -76,7 +102,7 @@ class DetailPage extends StatelessWidget {
               height: 40,
             ),
             Text(
-              annonce.datePost.toString(),
+              widget.annonce.datePost.toString(),
               style: const TextStyle(
                 fontSize: 15,
                 color: Colors.white,
@@ -89,8 +115,7 @@ class DetailPage extends StatelessWidget {
               height: 15,
             ),
             Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.center, // Center elements horizontally
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ButtonSelect(
                     text: "Commentaires",
@@ -102,16 +127,141 @@ class DetailPage extends StatelessWidget {
                   width: 15,
                 ),
                 ButtonSelect(
-                    text: "Répondre à l'annonce",
-                    tailleHeight: 50,
-                    tailleWidth: 160,
-                    fontSize: 20,
-                    onPressed: () => print("Repondre à l'annonce")),
+                  text: "Répondre à l'annonce",
+                  tailleHeight: 50,
+                  tailleWidth: 160,
+                  fontSize: 20,
+                  onPressed: () => dialogBuilder(context, widget.annonce),
+                ),
               ],
             )
           ],
         ),
       ),
     );
+  }
+
+  Future<void> dialogBuilder(BuildContext context, Annonce annonce) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return FutureBuilder<List<Map<String, dynamic>>>(
+          future: SupabaseDB.selectBiensByIDAnnonce(annonce.idU),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return const Text('Erreur');
+            } else {
+              final biens = (snapshot.data as List<Map<String, dynamic>>)
+                  .map((bienMap) => Biens.fromMap(bienMap))
+                  .toList();
+              final mesBiens = List<Biens>.from(biens);
+              final aPreter = <Biens>[];
+              return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return AlertDialog(
+                    title: const Text('Prêter un bien'),
+                    content: Column(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Mes Biens",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Expanded(
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: mesBiens.length,
+                                  itemBuilder: (context, index) {
+                                    final bien = mesBiens[index];
+                                    return ListTile(
+                                      title: Text(bien.libelle),
+                                      onTap: () {
+                                        setState(() {
+                                          mesBiens.remove(bien);
+                                          aPreter.add(bien);
+                                        });
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "A préter",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Expanded(
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: aPreter.length,
+                                  itemBuilder: (context, index) {
+                                    final bien = aPreter[index];
+                                    return ListTile(
+                                      title: Text(bien.libelle),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: <Widget>[
+                      DateTimePickerButton(
+                        onDateSelected: (selectedDate) {
+                          print('Date sélectionnée: $selectedDate');
+                          setState(() {
+                            maDateSelectionnee = selectedDate;
+                          });
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          print(
+                              'Biens sélectionnés: ${aPreter.map((bien) => bien.libelle).join(', ')}');
+                          ajouterDansPreter(
+                              biens, annonce.idU, maDateSelectionnee);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  void ajouterDansPreter(
+      List<Biens> biens, int idUtilisateur, DateTime? dateSelectionner) {
+    for (var bien in biens) {
+      print('Ajout de ${bien.libelle} dans la table preter');
+      SupabaseDB.insertPreter(idUtilisateur, bien.id, dateSelectionner);
+    }
   }
 }

@@ -26,16 +26,18 @@ class Biens {
     };
   }
 
-  static Biens fromMap(Map<String, dynamic> map) {
+   factory Biens.fromMap(Map<String, dynamic> map) {
     return Biens(
-      id: map['id'],
-      libelle: map['libelle'],
-      description: map['description'],
+      id: map['idB'] ?? 0,
+      libelle: map['libelleB'] ?? '',
+      description: map['descriptionB'] ?? '',
       pret: map['pret'] == 1,
-      img: map['img'],
-      idU: map['idU'],
+      img: map['images'] ?? '',
+      idU: map['idU'] ?? 0,
     );
   }
+
+  
 
   @override
   String toString() {
