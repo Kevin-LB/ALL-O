@@ -1,5 +1,6 @@
 import 'package:allo/db/alloDB.dart';
 import 'package:allo/db/supabase.dart';
+import 'package:allo/models/categorie.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/models/annonce.dart';
 
@@ -16,11 +17,13 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _categoryController = TextEditingController();
   Future<void>? _updateFuture;
 
   @override
   void initState() {
     super.initState();
+
     _titleController.text = widget.annonce.libelle;
     _descriptionController.text = widget.annonce.description;
   }
@@ -95,6 +98,8 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                                   idUser: widget.annonce.idU,
                                   idBiens: widget.annonce.idB,
                                 );
+                                AllDB().deleteAnnonce(widget.annonce.id);
+                                Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content:

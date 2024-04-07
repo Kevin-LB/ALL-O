@@ -196,6 +196,13 @@ class AllDB extends ChangeNotifier {
     });
   }
 
+  Future<int> getCategorieId(String libelle) async {
+    final _db = await db;
+    final List<Map<String, dynamic>> maps = await _db!
+        .query('Categorie', where: 'libelle = ?', whereArgs: [libelle]);
+    return maps[0]['id'];
+  }
+
   Future<bool> annonceExists(int id) async {
     final _db = db;
     final result =
@@ -241,9 +248,22 @@ class AllDB extends ChangeNotifier {
         whereArgs: [annonce.id],
       );
       print('Annonce updated');
+      notifyListeners();
+      refreshAnnonces();
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<void> deleteAnnonce(int id) async {
+    final db = await _db;
+    await db?.delete(
+      'Annonce',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    notifyListeners();
+    refreshAnnonces();
   }
 
   Future<bool> biensExists(int id) async {

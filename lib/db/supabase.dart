@@ -5,7 +5,8 @@ class SupabaseDB {
   static Future<void> init() async {
     await Supabase.initialize(
       url: "https://fidkenkusmgixuzuhwit.supabase.co",
-      anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZGtlbmt1c21naXh1enVod2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNDE3NTAsImV4cCI6MjAyNTkxNzc1MH0.vbvMxUNhGCsKr9ryl6MvRlHJ-cXQb-AC7zEwUBQmH7I",
+      anonKey:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZGtlbmt1c21naXh1enVod2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNDE3NTAsImV4cCI6MjAyNTkxNzc1MH0.vbvMxUNhGCsKr9ryl6MvRlHJ-cXQb-AC7zEwUBQmH7I",
     );
   }
 
@@ -41,14 +42,16 @@ class SupabaseDB {
       query.eq('email', email);
       query.eq('username', username);
 
-      final response = await query.execute();
+      final response = await query;
 
-      if (response.error != null) {
-        print('Erreur lors de la récupération des utilisateurs: ${response.error}');
+      if (response != null) {
+        print(
+            'Erreur lors de la récupération des utilisateurs: ${response}');
         return false;
       }
 
-      final List<Map<String, dynamic>> users = response.data as List<Map<String, dynamic>>;
+      final List<Map<String, dynamic>> users =
+          response as List<Map<String, dynamic>>;
 
       if (users.isNotEmpty) {
         print("L'email ou le nom d'utilisateur est déjà utilisé");
@@ -62,10 +65,6 @@ class SupabaseDB {
       return false;
     }
   }
-
-
-
-
 
   static Future<void> selectUser() async {
     final response = await supabase.from('utilisateur').select();

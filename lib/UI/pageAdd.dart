@@ -3,6 +3,7 @@
 import 'package:allo/UI/Controller/button.dart';
 import 'package:allo/UI/acceuil/home.dart';
 import 'package:allo/db/alloDB.dart';
+import 'package:allo/models/appartenirAnnonce.dart';
 import 'package:allo/models/categorie.dart';
 import 'package:allo/models/annonce.dart';
 
@@ -17,6 +18,8 @@ class PageAdd extends StatefulWidget {
 class _PageAddState extends State<PageAdd> {
   final Map<String, bool> _checkboxValues = {};
   String selectedCategories = "";
+  final _annonceController = TextEditingController();
+  final _descriptionController = TextEditingController();
 
   final allDb = AllDB();
 
@@ -26,6 +29,13 @@ class _PageAddState extends State<PageAdd> {
     initializeDatabase().then((_) {
       insertCategories();
     });
+  }
+
+  @override
+  void dispose() {
+    _annonceController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   Future<void> initializeDatabase() async {
@@ -95,9 +105,6 @@ class _PageAddState extends State<PageAdd> {
 
   @override
   Widget build(BuildContext context) {
-    final _annonceController = TextEditingController();
-    final _descriptionController = TextEditingController();
-
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFF3C3838),
@@ -182,7 +189,7 @@ class _PageAddState extends State<PageAdd> {
                       width: 300,
                       color: const Color(0xFF8C8585),
                       child: TextFormField(
-                        readOnly: true, // make the field read-only
+                        readOnly: true,
                         onTap: () {
                           dialogBuilder(context, onCheckboxChanged);
                         },
@@ -215,6 +222,21 @@ class _PageAddState extends State<PageAdd> {
                         idB: 1,
                         idU: 1,
                       );
+                      if (selectedCategories.isNotEmpty) {
+                        final categories = selectedCategories.split(', ');
+                        for (final category in categories) {
+                          String category = selectedCategories.isNotEmpty ? selectedCategories : '';
+                          int idCategorie = await allDb.getCategorieId(category);
+                          await allDb.insertAppartenirAnnonce(Appartenir_Annonce(
+                            idA: annonceInsert.id,
+                            idC: idCategorie,
+                          )
+                          
+                        );
+                          
+                        }
+                      }
+
                       await allDb.insertAnnonce(annonceInsert);
                       if (mounted) {
                         navigateToHome(context);

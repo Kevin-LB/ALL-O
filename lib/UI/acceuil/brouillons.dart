@@ -1,6 +1,7 @@
 import 'package:allo/UI/setBrouillons.dart';
 import 'package:allo/db/alloDB.dart';
 import 'package:allo/models/annonce.dart';
+import 'package:allo/models/categorie.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -50,7 +51,7 @@ class _BrouillonsPageState extends State<BrouillonsPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              UpdateAnnoncePage(annonce: annonce),
+                              UpdateAnnoncePage(annonce: annonce ),
                         ),
                       );
                       setState(() {
