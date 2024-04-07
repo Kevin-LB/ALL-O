@@ -202,6 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Etat Annonce: $etatAnnonce');
       print('Date de prêt: $dateFinPret');
       if (dateFinPret != null && dateFinPret.isBefore(DateTime.now())) {
+        await SupabaseDB.updatePreter(annonce: annonce, etat: false);
         return 'Cloturée';
       }
       if (etatAnnonce == null) {
@@ -258,17 +259,24 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ButtonSelect(
-              text: "Mes Prêts",
-              onPressed: () => navigateToPage2(context),
-            ),
-            ButtonSelect(
-              text: "Brouillons",
-              onPressed: () => navigateToBrouillon(context),
-            ),
-            ButtonSelect(
-              text: "Mes Biens",
-              onPressed: () => navigateToBiens(context),
+            
+            Row(
+              children: [
+              ButtonSelect(
+                text: "Mes Prêts",
+                onPressed: () => navigateToPage2(context),
+              ),
+              const SizedBox(width: 10),
+              ButtonSelect(
+                text: "Brouillons",
+                onPressed: () => navigateToBrouillon(context),
+              ),
+              const SizedBox(width: 10),
+              ButtonSelect(
+                text: "BiensB",
+                onPressed: () => navigateToBiens(context),
+              ),
+              ],
             ),
             const Padding(
               padding: EdgeInsets.only(top: 20.0),

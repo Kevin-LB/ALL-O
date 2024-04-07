@@ -27,9 +27,7 @@ class _BiensAddPageState extends State<BiensAddPage> {
   @override
   void initState() {
     super.initState();
-    initializeDatabase().then((_) {
-      insertBiens();
-    });
+    initializeDatabase();
   }
 
   @override
@@ -44,36 +42,6 @@ class _BiensAddPageState extends State<BiensAddPage> {
     final categories = await getCategories();
     for (var category in categories) {
       _checkboxValues[category.libelle] = false;
-    }
-  }
-
-  void insertBiens() async {
-    var biens = [
-      Biens(
-          id: 1,
-          libelle: 'Bien 1',
-          description: 'Description du bien 1',
-          img: 'image1.png',
-          pret: false,
-          idU: 1),
-      Biens(
-          id: 2,
-          libelle: 'Bien 2',
-          description: 'Description du bien 2',
-          img: 'image2.png',
-          pret: false,
-          idU: 1),
-      Biens(
-          id: 3,
-          libelle: 'Bien 3',
-          description: 'Description du bien 3',
-          img: 'image3.png',
-          pret: false,
-          idU: 1),
-    ];
-
-    for (final bien in biens) {
-      await allDb.insertBiens(bien);
     }
   }
 

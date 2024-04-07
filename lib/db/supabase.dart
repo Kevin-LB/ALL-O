@@ -163,6 +163,35 @@ class SupabaseDB {
     print('Biens inséré avec succès');
   }
 
+  static Future<bool> selectBiensNonPreter(int idUtilisateur) async {
+    var response = await supabase
+        .from("biens")
+        .select("pret")
+        .eq("idU", idUtilisateur)
+        .eq("pret", false);
+
+    if (response != null && response.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> selectBiensPreter(
+      int idUtilisateur) async {
+    var response = await supabase
+        .from("biens")
+        .select("*")
+        .eq("idU", idUtilisateur)
+        .eq("pret", true);
+
+    if (response != null && response.isNotEmpty) {
+      return response;
+    } else {
+      return [];
+    }
+  }
+
   static Future<void> insertCategories(
       String libelleCategorie, int idCategorie) async {
     var response = await supabase
@@ -210,15 +239,31 @@ class SupabaseDB {
           'idB': idBiens,
           "etat": "en cours",
           "date_fin": dateSelectionner?.toIso8601String()
-        },
-        await supabase.from("biens").update({"pret": true}).eq("idB", idBiens),
-        await supabase
-            .from("annonce")
-            .update({"idB": idBiens}).eq("idA", annonce.id)
+        }
       ]);
+
+      await supabase.from("biens").update({"pret": true}).eq("idB", idBiens);
+
+      await supabase
+          .from("annonce")
+          .update({"idB": idBiens}).eq("idA", annonce.id);
     } catch (e) {
       print('Erreur lors de l\'insertion : $e');
     }
+  }
+
+  static Future<void> updatePreter(
+      {required Annonce annonce, required bool etat}) async {
+    await supabase
+        .from('biens')
+        .update({"pret": etat})
+        .eq("idB", annonce.idB)
+        .eq("idU", annonce.idU);
+    await supabase
+        .from("preter")
+        .update({"etat": "rendu"})
+        .eq("idU", annonce.idU)
+        .eq("idB", annonce.idB);
   }
 
   static Future<int> getidbfromAnnonce(int idA) async {

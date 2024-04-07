@@ -1,19 +1,32 @@
+import 'package:allo/db/supabase.dart';
 import 'package:flutter/material.dart';
 
-class Loan {
-  final String title;
-  final String borrower;
-  final double amount;
-
-  Loan({required this.title, required this.borrower, required this.amount});
+class MyLoansPage extends StatefulWidget {
+  @override
+  _MyLoansPageState createState() => _MyLoansPageState();
 }
 
-class MyLoansPage extends StatelessWidget {
-  final List<Loan> loans = [
-    Loan(title: "Livre", borrower: "Jean", amount: 20.0),
-    Loan(title: "Outil de jardinage", borrower: "Marie", amount: 30.0),
-    Loan(title: "Vélo", borrower: "Luc", amount: 50.0),
-  ];
+class _MyLoansPageState extends State<MyLoansPage> {
+  List<dynamic> loans = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchLoans();
+  }
+
+  Future<void> fetchLoans() async {
+    final response = await SupabaseDB.selectBiensPreter(1);
+    print('Prêts récupérés: ${response}');
+
+    if (response != null) {
+      setState(() {
+        loans = response;
+      });
+    } else {
+      print('Erreur lors de la récupération des prêts: ${response}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +37,22 @@ class MyLoansPage extends StatelessWidget {
       body: ListView.builder(
         itemCount: loans.length,
         itemBuilder: (context, index) {
+          final loan = loans[index];
           return ListTile(
-            title: Text(loans[index].title),
-            subtitle: Text('Emprunté par: ${loans[index].borrower}'),
-            trailing: Text('${loans[index].amount.toString()} €'),
+            title: Text(
+              'Prêt ${index + 1}',
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 25,
+              ),
+            ),
+            subtitle: Text(
+              '${loan['libelleB']}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+              ),
+            ),
           );
         },
       ),
