@@ -1,6 +1,7 @@
 // Importez les bibliothèques nécessaires
 import 'dart:async';
 import 'package:allo/UI/acceuil/biensPage.dart';
+import 'package:allo/models/categorie.dart';
 import 'package:allo/models/objet.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
@@ -37,6 +38,7 @@ class _HomeState extends State<Home> {
     super.initState();
     _getSession();
     loadAnnonces();
+    insertCategories().then((_) => insertCategorieSupabase());
   }
 
   Future<void> _getSession() async {
@@ -53,6 +55,39 @@ class _HomeState extends State<Home> {
       setState(() {});
     } catch (e) {
       print('Failed to get session: $e');
+    }
+  }
+
+  Future<void> insertCategories() async {
+    var categories = [
+      const Categorie(id: 1, libelle: 'Outillage'),
+      const Categorie(id: 2, libelle: 'Vêtements'),
+      const Categorie(id: 3, libelle: 'Meubles'),
+      const Categorie(id: 4, libelle: 'Electroménager'),
+      const Categorie(id: 5, libelle: 'Jouets'),
+      const Categorie(id: 6, libelle: 'Livres'),
+    ];
+
+    for (final category in categories) {
+      try {
+        await AllDB().insertCategorie(category);
+      } catch (e) {
+        print('Erreur lors de l\'insertion de la catégorie $category: $e');
+      }
+    }
+  }
+
+  insertCategorieSupabase() async {
+    List<Categorie> categories = await AllDB().categories();
+    for (final category in categories) {
+      var exists = await supabase
+          .from('categories')
+          .select()
+          .eq('idC', category.id)
+          .maybeSingle();
+      if (exists == null) {
+        SupabaseDB.insertCategories(category.libelle, category.id);
+      }
     }
   }
 

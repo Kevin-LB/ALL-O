@@ -1,5 +1,6 @@
 import 'package:allo/db/alloDB.dart';
 import 'package:allo/db/supabase.dart';
+import 'package:allo/models/appartenirAnnonce.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/models/annonce.dart';
 
@@ -17,6 +18,7 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   Future<void>? _updateFuture;
+  List<Appartenir_Annonce> listeAppartenirAnnonce = [];
 
   @override
   void initState() {
@@ -24,6 +26,25 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
 
     _titleController.text = widget.annonce.libelle;
     _descriptionController.text = widget.annonce.description;
+    loadAppartenirAnnonces();
+  }
+
+  Future<void> loadAppartenirAnnonces() async {
+    List<Appartenir_Annonce> appartenirAnnonces =
+        await AllDB().appartenirAnnonceByID(widget.annonce.id);
+    setState(() {
+      listeAppartenirAnnonce = appartenirAnnonces;
+    });
+  }
+
+  Future<void> loadAppartenirAnnonces2() async {
+    List<Map<String, dynamic>> appartenirAnnonces =
+        await SupabaseDB.selectCategoriesbyId(widget.annonce.id);
+    setState(() {
+      listeAppartenirAnnonce = appartenirAnnonces
+          .map((map) => Appartenir_Annonce.fromMap(map))
+          .toList();
+    });
   }
 
   @override
@@ -58,6 +79,8 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                   return null;
                 },
               ),
+              Text(
+                  "Catégories de l'annonce ${listeAppartenirAnnonce.map((e) => e.idC).toList()}"),
               FutureBuilder(
                 future: _updateFuture,
                 builder: (context, snapshot) {
@@ -68,7 +91,7 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                       children: [
                         ElevatedButton(
                           child: const Text('Soumettre'),
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               widget.annonce.libelle = _titleController.text;
                               widget.annonce.description =
@@ -76,6 +99,7 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                               _updateFuture = AllDB()
                                   .updateAnnonce(widget.annonce)
                                   .then((_) {
+                                ajouterAnnonceAAppartenirAnnonce();
                                 Navigator.pop(context);
                               });
                             }
@@ -90,12 +114,22 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                               var response = await SupabaseDB.selectBiens(
                                   widget.annonce.idB);
                               if (response.isNotEmpty) {
-                                SupabaseDB.insertAnnonce(
+                                await SupabaseDB.insertAnnonce(
                                   titre: _titleController.text,
                                   description: _descriptionController.text,
                                   idUser: widget.annonce.idU,
                                   idBiens: widget.annonce.idB,
-                                );
+                                ).then((idA) => {
+                                      for (Appartenir_Annonce appartenirAnnonce
+                                          in listeAppartenirAnnonce)
+                                        {
+                                          SupabaseDB.insertAppartenirAnnonce(
+                                            idAnnonce: idA,
+                                            idCategorie: appartenirAnnonce.idC,
+                                          )
+                                        }
+                                    });
+
                                 AllDB().deleteAnnonce(widget.annonce.id);
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -122,5 +156,22 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
         ),
       ),
     );
+  }
+
+  Future<void> ajouterAnnonceAAppartenirAnnonce() async {
+    List<Annonce> annonces = await AllDB().annonces();
+
+    Annonce annonceAValider = annonces.first;
+
+    // Insérer l'annonce dans Supabase
+    await SupabaseDB.insertAnnonce(
+      titre: annonceAValider.libelle,
+      description: annonceAValider.description,
+      idUser: annonceAValider.idU,
+      idBiens: annonceAValider.idB,
+    );
+
+    List<Annonce> annoncesSupabase = await SupabaseDB.selectAnnonces();
+    Annonce annonceInseree = annoncesSupabase.first;
   }
 }

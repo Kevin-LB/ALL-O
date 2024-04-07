@@ -3,6 +3,7 @@
 import 'package:allo/UI/Controller/button.dart';
 import 'package:allo/UI/acceuil/home.dart';
 import 'package:allo/db/alloDB.dart';
+import 'package:allo/db/supabase.dart';
 import 'package:allo/models/appartenirAnnonce.dart';
 import 'package:allo/models/categorie.dart';
 import 'package:allo/models/annonce.dart';
@@ -26,9 +27,7 @@ class _PageAddState extends State<PageAdd> {
   @override
   void initState() {
     super.initState();
-    initializeDatabase().then((_) {
-      insertCategories();
-    });
+    initializeDatabase();
   }
 
   @override
@@ -39,49 +38,14 @@ class _PageAddState extends State<PageAdd> {
   }
 
   Future<void> initializeDatabase() async {
-    await allDb.initDb();
-    final categories = await getCategories();
+    final categories = await SupabaseDB.selectCategories();
+    print("Les catégories récupérées sont : $categories");
     for (var category in categories) {
-      _checkboxValues[category.libelle] = false;
-    }
-  }
-
-  Future<List<Categorie>> getCategories() async {
-    try {
-      final db = await allDb.db;
-      if (db == null) {
-        print('Database is null');
-        return [];
+      if (category['libelleC'] != null) {
+        _checkboxValues[category['libelleC']] = false;
+      } else {
+        print("Le libellé de la catégorie est null");
       }
-      final List<Map<String, dynamic>> maps = await db.query('Categorie');
-      if (maps.isEmpty) {
-        print('No categories found');
-        return [];
-      }
-      return List.generate(maps.length, (i) {
-        return Categorie(
-          id: maps[i]['id'],
-          libelle: maps[i]['libelle'],
-        );
-      });
-    } catch (e) {
-      print(e);
-      return [];
-    }
-  }
-
-  void insertCategories() async {
-    var categories = [
-      const Categorie(id: 1, libelle: 'Outillage'),
-      const Categorie(id: 2, libelle: 'Vêtements'),
-      const Categorie(id: 3, libelle: 'Meubles'),
-      const Categorie(id: 4, libelle: 'Electroménager'),
-      const Categorie(id: 5, libelle: 'Jouets'),
-      const Categorie(id: 6, libelle: 'Livres'),
-    ];
-
-    for (final category in categories) {
-      await allDb.insertCategorie(category);
     }
   }
 
@@ -222,18 +186,25 @@ class _PageAddState extends State<PageAdd> {
                         idB: 1,
                         idU: 1,
                       );
+                      print(
+                          "les catégories sélectionnées: $selectedCategories");
                       if (selectedCategories.isNotEmpty) {
-                        final categories = selectedCategories.split(', ');
-                        for (final category in categories) {
-                          String category = selectedCategories.isNotEmpty ? selectedCategories : '';
-                          int idCategorie = await allDb.getCategorieId(category);
-                          await allDb.insertAppartenirAnnonce(Appartenir_Annonce(
-                            idA: annonceInsert.id,
-                            idC: idCategorie,
-                          )
-                          
-                        );
-                          
+                        print(
+                            "les catégories sélectionnées: $selectedCategories");
+                        if (selectedCategories.isNotEmpty) {
+                          String categories = selectedCategories.isNotEmpty
+                              ? selectedCategories
+                              : '';
+                          for (final categorie in categories.split(', ')) {
+                            int idCategorie =
+                                await allDb.getCategorieId(categorie);
+                            print("Test insertAppartenirAnnonce");
+                            await allDb
+                                .insertAppartenirAnnonce(Appartenir_Annonce(
+                              idA: annonceInsert.id,
+                              idC: idCategorie,
+                            ));
+                          }
                         }
                       }
 
@@ -254,6 +225,23 @@ class _PageAddState extends State<PageAdd> {
                         idU: 1,
                       );
                       await allDb.insertAnnonce(annonceInsert);
+                      print(
+                          "les catégories sélectionnées: $selectedCategories");
+                      if (selectedCategories.isNotEmpty) {
+                        String categories = selectedCategories.isNotEmpty
+                            ? selectedCategories
+                            : '';
+                        for (final categorie in categories.split(', ')) {
+                          int idCategorie =
+                              await allDb.getCategorieId(categorie);
+                          print("Test insertAppartenirAnnonce");
+                          await allDb
+                              .insertAppartenirAnnonce(Appartenir_Annonce(
+                            idA: annonceInsert.id,
+                            idC: idCategorie,
+                          ));
+                        }
+                      }
                       if (mounted) {
                         navigateToHome(context);
                       }

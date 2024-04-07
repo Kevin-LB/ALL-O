@@ -81,6 +81,7 @@ class _UpdateBiensPageState extends State<UpdateBiensPage> {
                       description: _descriptionController.text,
                       idUser: widget.biens.idU,
                     );
+
                     AllDB().deleteBiens(widget.biens.id);
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
