@@ -146,10 +146,30 @@ class _HomeScreenState extends State<HomeScreen> {
     loadAnnonces();
   }
 
+  Future<DateTime?> getDatePret(int idBiens) async {
+    var datePretString = await SupabaseDB.getDatePret(idBiens);
+
+    if (datePretString != null) {
+      print('Date FIN Pret: $datePretString');
+      return datePretString;
+    } else {
+      print("La date n'a pas pu être analysée: $datePretString");
+      return null;
+    }
+  }
+
   void loadAnnonces() async {
     List<Annonce> annoncesList = await SupabaseDB.selectAnnonces();
     print('Annonces FININI: $annoncesList');
     annonces = Future.value(annoncesList);
+    for (Annonce annonce in annoncesList) {
+      DateTime? datePret = await getDatePret(annonce.idB);
+      if (datePret != null) {
+        print('Date de prêt pour l\'annonce ${annonce.id}: $datePret');
+      } else {
+        print('Pas de date de prêt pour l\'annonce ${annonce.id}');
+      }
+    }
     setState(() {});
   }
 
@@ -176,8 +196,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String getStatus(int index) {
-      return index % 2 == 0 ? 'Ouverte' : 'Pourvue';
+    Future<String> getStatusAnnonce(Annonce annonce) async {
+      var etatAnnonce = await SupabaseDB.getidbfromAnnonce(annonce.id);
+      DateTime? dateFinPret = await getDatePret(annonce.idB);
+      print('Etat Annonce: $etatAnnonce');
+      print('Date de prêt: $dateFinPret');
+      if (dateFinPret != null && dateFinPret.isBefore(DateTime.now())) {
+        return 'Cloturée';
+      }
+      if (etatAnnonce == null) {
+        return 'Ouverte';
+      }
+
+      return etatAnnonce == 0 ? 'Ouverte' : 'Pourvue';
     }
 
     return Scaffold(
@@ -269,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (BuildContext context, int index) {
                         Annonce? annonce = snapshot.data![index];
                         if (annonce != null) {
-                          String? status = getStatus(index);
+                          Future<String> status = getStatusAnnonce(annonce);
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -299,7 +330,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildContainer(Annonce annonce, String status) {
+  Widget _buildContainer(Annonce annonce, Future<String> status) {
+    Color colorAnnonce(String status) {
+      switch (status) {
+        case 'Cloturée':
+          return const Color.fromARGB(255, 137, 0, 0);
+        case 'Pourvue':
+          return const Color(0xFFE78138);
+        default:
+          return const Color(0xFF92D668);
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFD9D9D9),
@@ -334,23 +376,32 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          Container(
-            height: 35.0,
-            width: 80,
-            decoration: BoxDecoration(
-              color: status == 'Ouverte'
-                  ? const Color(0xFF92D668)
-                  : const Color(0xFFE78138),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              status,
-              style: const TextStyle(
-                color: Color(0xFFFFFFFF),
-                fontSize: 10.0,
-              ),
-            ),
+          FutureBuilder<String>(
+            future: status,
+            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Erreur : ${snapshot.error}');
+              } else {
+                return Container(
+                  height: 35.0,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    color: colorAnnonce(snapshot.data!),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    snapshot.data!,
+                    style: const TextStyle(
+                      color: Color(0xFFFFFFFF),
+                      fontSize: 10.0,
+                    ),
+                  ),
+                );
+              }
+            },
           ),
         ],
       ),

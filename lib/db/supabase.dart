@@ -220,4 +220,39 @@ class SupabaseDB {
       print('Erreur lors de l\'insertion : $e');
     }
   }
+
+  static Future<int> getidbfromAnnonce(int idA) async {
+    final response = await supabase
+        .from('annonce')
+        .select('idB')
+        .eq('idA', idA)
+        .then((value) => value[0]['idB'] is int ? value[0]['idB'] as int : 0);
+    print('idB: $response');
+    return response ?? 0;
+  }
+
+  static Future<DateTime?> getDatePret(int idB) async {
+    final response =
+        await supabase.from('preter').select('date_fin').eq('idB', idB);
+
+    if (response != null && response.isNotEmpty) {
+      var dateFinString = response[0]['date_fin'];
+      if (dateFinString != null) {
+        var dateFin = DateTime.tryParse(dateFinString);
+        if (dateFin != null) {
+          print('date_fin: $dateFin');
+          return dateFin;
+        } else {
+          print("La date n'a pas pu être analysée: $dateFinString");
+          return null;
+        }
+      } else {
+        print("La date de fin est nulle.");
+        return null;
+      }
+    } else {
+      print("La réponse de la requête est nulle ou vide.");
+      return null;
+    }
+  }
 }
