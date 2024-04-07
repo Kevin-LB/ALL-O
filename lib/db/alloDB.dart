@@ -200,7 +200,11 @@ class AllDB extends ChangeNotifier {
     final _db = await db;
     final List<Map<String, dynamic>> maps = await _db!
         .query('Categorie', where: 'libelle = ?', whereArgs: [libelle]);
-    return maps[0]['id'];
+    if (maps.isNotEmpty) {
+      return maps[0]['id'];
+    } else {
+      throw Exception('Aucune catégorie trouvée avec le libellé $libelle');
+    }
   }
 
   Future<bool> annonceExists(int id) async {
@@ -265,7 +269,6 @@ class AllDB extends ChangeNotifier {
     notifyListeners();
     refreshAnnonces();
   }
-
 
   Future<bool> biensExists(int id) async {
     final _db = db;
@@ -337,6 +340,7 @@ class AllDB extends ChangeNotifier {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
+    print('Appartenir Annonce inserted');
     notifyListeners();
     refreshAppartenirAnnonces();
   }
@@ -435,6 +439,19 @@ class AllDB extends ChangeNotifier {
     final db = await _db;
     final List<Map<String, dynamic>> maps =
         await db!.query('Appartenir_Annonce');
+    print("la table Appartenir_Annonce de la bdLocal : $maps");
+    return List.generate(maps.length, (i) {
+      return Appartenir_Annonce(
+        idA: maps[i]['idA'],
+        idC: maps[i]['idC'],
+      );
+    });
+  }
+
+  Future<List<Appartenir_Annonce>> appartenirAnnonceByID(int idA) async {
+    final db = await _db;
+    final List<Map<String, dynamic>> maps = await db!
+        .query('Appartenir_Annonce', where: 'idA = ?', whereArgs: [idA]);
     return List.generate(maps.length, (i) {
       return Appartenir_Annonce(
         idA: maps[i]['idA'],

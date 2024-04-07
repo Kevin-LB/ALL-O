@@ -46,8 +46,7 @@ class SupabaseDB {
       final response = await query;
 
       if (response != null) {
-        print(
-            'Erreur lors de la récupération des utilisateurs: ${response}');
+        print('Erreur lors de la récupération des utilisateurs: ${response}');
         return false;
       }
 
@@ -72,7 +71,7 @@ class SupabaseDB {
     print('response: ${response}');
   }
 
-  static Future<void> insertAnnonce(
+  static Future<int> insertAnnonce(
       {required String titre,
       required String description,
       required int idUser,
@@ -85,10 +84,39 @@ class SupabaseDB {
         "idB": idBiens
       }
     ]);
+    Future<int> idA = supabase
+        .from('annonce')
+        .select()
+        .eq('libelleA', titre)
+        .then((value) => value[0]['idA'] as int);
     print('Annonce insérée avec succès');
+
+    return idA;
+  }
+
+  static Future<List<Annonce>> selectAnnonces() async {
+    final response = await supabase.from('annonce').select();
+
+    List<Annonce> annonces = [];
+    for (var annonce in response) {
+      annonces.add(Annonce.fromMap(annonce));
+    }
+    return annonces;
+  }
+
+  static Future<void> insertAppartenirAnnonce(
+      {required int idAnnonce, required int idCategorie}) async {
+    await supabase.from('appartenir_annonce').insert([
+      {
+        'idA': idAnnonce,
+        'idC': idCategorie,
+      }
+    ]);
+    print('Appartenir inséré avec succès');
   }
 
   static PostgrestFilterBuilder<PostgrestList> selectBiens(int idBiens) {
+    print('idBiens: ${idBiens}');
     return supabase.from('biens').select().eq('idB', idBiens);
   }
 
@@ -97,30 +125,18 @@ class SupabaseDB {
     print('response: ${reponse}');
   }
 
-  static Future<List<Annonce>> selectAnnonces() async {
-    final response = await supabase.from('annonce').select();
-    print('response: ${response}');
-
-    List<Annonce> annonces = [];
-    for (var annonce in response) {
-      annonces.add(Annonce.fromMap(annonce));
-    }
-    print('Annonces: ${annonces}');
-    return annonces;
-  }
-
   static Future<void> updateBiens(Biens biens) async {
     await supabase.from('biens').update({
       'libelleB': biens.libelle,
       'descriptionB': biens.description,
-      "pret" : biens.pret ? 1 : 0,
+      "pret": biens.pret ? 1 : 0,
       "idU": biens.idU,
       "image": biens.img
     }).eq('idB', biens.id);
     print('Annonce mise à jour avec succès');
   }
 
-  static Future<void> insertBiens( {
+  static Future<void> insertBiens({
     required String titre,
     required String description,
     required int idUser,
@@ -134,5 +150,41 @@ class SupabaseDB {
       }
     ]);
     print('Biens inséré avec succès');
-  } 
+  }
+
+  static Future<void> insertCategories(
+      String libelleCategorie, int idCategorie) async {
+    var response = await supabase
+        .from('categories')
+        .select('libelleC')
+        .eq('libelleC', libelleCategorie);
+
+    if (response.isEmpty) {
+      await supabase.from('categories').insert([
+        {
+          "idC": idCategorie,
+          'libelleC': libelleCategorie,
+        }
+      ]);
+      print('Catégorie insérée avec succès');
+    } else {
+      print('La catégorie existe déjà');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> selectCategories() {
+    return supabase
+        .from('categories')
+        .select()
+        .then((res) => res as List<Map<String, dynamic>>);
+  }
+
+  static Future<List<Map<String, dynamic>>> selectCategoriesbyId(
+      int idCategorie) {
+    return supabase
+        .from('categories')
+        .select()
+        .eq('idC', idCategorie)
+        .then((res) => res);
+  }
 }

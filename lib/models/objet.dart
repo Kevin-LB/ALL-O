@@ -20,7 +20,7 @@ class Biens {
       'id': id,
       'libelle': libelle,
       'description': description,
-      'pret': pret ? 1 : 0, // Convert bool to int
+      'pret': pret ? 1 : 0,
       'img': img,
       'idU': idU,
     };
@@ -31,7 +31,7 @@ class Biens {
       id: map['id'],
       libelle: map['libelle'],
       description: map['description'],
-      pret: map['pret'] == 1, 
+      pret: map['pret'] == 1,
       img: map['img'],
       idU: map['idU'],
     );
