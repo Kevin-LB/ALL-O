@@ -36,18 +36,18 @@ class Annonce {
         map['libelleA'] == null ||
         map['descriptionA'] == null ||
         map['datePost'] == null ||
-        map['idB'] == null ||
         map['idU'] == null) {
       throw Exception('Missing key in map');
     }
 
     return Annonce(
-      id: map['idA'] as int ?? 0,
-      libelle: map['libelleA'] as String ?? '',
-      description: map['descriptionA'] as String ?? '',
+      id: map['idA'] != null ? map['idA'] as int : 0,
+      libelle: map['libelleA'] != null ? map['libelleA'] as String : '',
+      description:
+          map['descriptionA'] != null ? map['descriptionA'] as String : '',
       datePost: DateTime.parse(map['datePost'] as String),
-      idB: map['idB'] as int ?? 0,
-      idU: map['idU'] as int ?? 0,
+      idB: map['idB'] != null ? map['idB'] as int : 0,
+      idU: map['idU'] != null ? map['idU'] as int : 0,
     );
   }
 }

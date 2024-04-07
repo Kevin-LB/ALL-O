@@ -26,7 +26,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> fetchBiens() async {
-    var biens = await SupabaseDB.selectBiensByIDAnnonce(widget.annonce.idU);
+    var biens = await SupabaseDB.selectBiensByIDAnnonceNonPreter(widget.annonce.idU);
     for (var bienMap in biens) {
       var bien = Biens.fromMap(bienMap);
       mesBiens.add(bien);
@@ -146,7 +146,7 @@ class _DetailPageState extends State<DetailPage> {
       context: context,
       builder: (context) {
         return FutureBuilder<List<Map<String, dynamic>>>(
-          future: SupabaseDB.selectBiensByIDAnnonce(annonce.idU),
+          future: SupabaseDB.selectBiensByIDAnnonceNonPreter(annonce.idU),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -241,7 +241,7 @@ class _DetailPageState extends State<DetailPage> {
                           print(
                               'Biens sélectionnés: ${aPreter.map((bien) => bien.libelle).join(', ')}');
                           ajouterDansPreter(
-                              biens, annonce.idU, maDateSelectionnee);
+                              biens, annonce, maDateSelectionnee);
                           Navigator.of(context).pop();
                         },
                         child: const Text('OK'),
@@ -258,10 +258,10 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void ajouterDansPreter(
-      List<Biens> biens, int idUtilisateur, DateTime? dateSelectionner) {
+      List<Biens> biens, Annonce annonce, DateTime? dateSelectionner) {
     for (var bien in biens) {
       print('Ajout de ${bien.libelle} dans la table preter');
-      SupabaseDB.insertPreter(idUtilisateur, bien.id, dateSelectionner);
+      SupabaseDB.insertPreter(annonce, bien.id, dateSelectionner);
     }
   }
 }

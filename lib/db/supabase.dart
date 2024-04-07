@@ -71,17 +71,16 @@ class SupabaseDB {
     print('response: ${response}');
   }
 
-  static Future<int> insertAnnonce(
-      {required String titre,
-      required String description,
-      required int idUser,
-      required int idBiens}) async {
+  static Future<int> insertAnnonce({
+    required String titre,
+    required String description,
+    required int idUser,
+  }) async {
     await supabase.from('annonce').insert([
       {
         'libelleA': titre,
         'descriptionA': description,
         'idU': idUser,
-        "idB": idBiens
       }
     ]);
     Future<int> idA = supabase
@@ -126,9 +125,13 @@ class SupabaseDB {
     return supabase.from('biens').select().eq('idB', idBiens);
   }
 
-  static Future<List<Map<String, dynamic>>> selectBiensByIDAnnonce(
+  static Future<List<Map<String, dynamic>>> selectBiensByIDAnnonceNonPreter(
       int idUser) async {
-    final response = await supabase.from('biens').select().eq('idU', idUser);
+    final response = await supabase
+        .from('biens')
+        .select()
+        .eq('idU', idUser)
+        .eq("pret", false);
     print("response: $response");
     return response;
   }
@@ -197,17 +200,21 @@ class SupabaseDB {
   }
 
   static Future<void> insertPreter(
-      int idUtilisateur, int idBiens, DateTime? dateSelectionner) async {
+      Annonce annonce, int idBiens, DateTime? dateSelectionner) async {
     print(
-        'idUtilisateur: $idUtilisateur, idBiens: $idBiens, dateSelectionner: $dateSelectionner');
+        'idUtilisateur: ${annonce.idU}, idBiens: $idBiens, dateSelectionner: $dateSelectionner');
     try {
       var response = await supabase.from('preter').insert([
         {
-          'idU': idUtilisateur,
+          'idU': annonce.idU,
           'idB': idBiens,
           "etat": "en cours",
           "date_fin": dateSelectionner?.toIso8601String()
-        }
+        },
+        await supabase.from("biens").update({"pret": true}).eq("idB", idBiens),
+        await supabase
+            .from("annonce")
+            .update({"idB": idBiens}).eq("idA", annonce.id)
       ]);
     } catch (e) {
       print('Erreur lors de l\'insertion : $e');

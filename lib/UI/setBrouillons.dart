@@ -112,14 +112,14 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                           onPressed: () async {
                             print('Envoi à Supabase');
                             if (_formKey.currentState!.validate()) {
-                              var response = await SupabaseDB.selectBiensByIdBiens(
-                                  widget.annonce.idB);
+                              var response =
+                                  await SupabaseDB.selectBiensByIdBiens(
+                                      widget.annonce.idB);
                               if (response.isNotEmpty) {
                                 await SupabaseDB.insertAnnonce(
                                   titre: _titleController.text,
                                   description: _descriptionController.text,
                                   idUser: widget.annonce.idU,
-                                  idBiens: widget.annonce.idB,
                                 ).then((idA) => {
                                       for (Appartenir_Annonce appartenirAnnonce
                                           in listeAppartenirAnnonce)
@@ -168,7 +168,6 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
       titre: annonceAValider.libelle,
       description: annonceAValider.description,
       idUser: annonceAValider.idU,
-      idBiens: annonceAValider.idB,
     );
 
     List<Annonce> annoncesSupabase = await SupabaseDB.selectAnnonces();
