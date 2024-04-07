@@ -1,4 +1,5 @@
 import 'package:allo/models/annonce.dart';
+import 'package:allo/models/objet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseDB {
@@ -107,4 +108,31 @@ class SupabaseDB {
     print('Annonces: ${annonces}');
     return annonces;
   }
+
+  static Future<void> updateBiens(Biens biens) async {
+    await supabase.from('biens').update({
+      'libelleB': biens.libelle,
+      'descriptionB': biens.description,
+      "pret" : biens.pret ? 1 : 0,
+      "idU": biens.idU,
+      "image": biens.img
+    }).eq('idB', biens.id);
+    print('Annonce mise à jour avec succès');
+  }
+
+  static Future<void> insertBiens( {
+    required String titre,
+    required String description,
+    required int idUser,
+  }) async {
+    await supabase.from('biens').insert([
+      {
+        'libelleB': titre,
+        'descriptionB': description,
+        'idU': idUser,
+        "pret": false,
+      }
+    ]);
+    print('Biens inséré avec succès');
+  } 
 }

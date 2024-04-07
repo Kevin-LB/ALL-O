@@ -1,6 +1,5 @@
 import 'package:allo/db/alloDB.dart';
 import 'package:allo/db/supabase.dart';
-import 'package:allo/models/categorie.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/models/annonce.dart';
 
@@ -17,7 +16,6 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _categoryController = TextEditingController();
   Future<void>? _updateFuture;
 
   @override
@@ -91,7 +89,7 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                               await SupabaseDB.selectBien_v2();
                               var response = await SupabaseDB.selectBiens(
                                   widget.annonce.idB);
-                              if (response != null && response.isNotEmpty) {
+                              if (response.isNotEmpty) {
                                 SupabaseDB.insertAnnonce(
                                   titre: _titleController.text,
                                   description: _descriptionController.text,

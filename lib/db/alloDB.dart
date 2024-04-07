@@ -266,6 +266,7 @@ class AllDB extends ChangeNotifier {
     refreshAnnonces();
   }
 
+
   Future<bool> biensExists(int id) async {
     final _db = db;
     final result =
@@ -276,20 +277,36 @@ class AllDB extends ChangeNotifier {
 
   Future<void> insertBiens(Biens biens) async {
     final db = await _db;
-    if (await biensExists(biens.id)) {
-      await db?.update(
-        'Biens',
-        biens.toMap(),
-        where: 'id = ?',
-        whereArgs: [biens.id],
-      );
-    } else {
-      await db?.insert(
-        'Biens',
-        biens.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
+
+    await db?.insert(
+      'Biens',
+      biens.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    print("Biens inserted");
+    notifyListeners();
+    refreshBiens();
+  }
+
+  Future<void> updateBiens(Biens biens) async {
+    final db = await _db;
+    await db?.update(
+      'Biens',
+      biens.toMap(),
+      where: 'id = ?',
+      whereArgs: [biens.id],
+    );
+    notifyListeners();
+    refreshBiens();
+  }
+
+  Future<void> deleteBiens(int id) async {
+    final db = await _db;
+    await db?.delete(
+      'Biens',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
     notifyListeners();
     refreshBiens();
   }
@@ -407,7 +424,7 @@ class AllDB extends ChangeNotifier {
         id: maps[i]['id'],
         libelle: maps[i]['libelle'],
         description: maps[i]['description'],
-        pret: maps[i]['pret'],
+        pret: maps[i]['pret'] == 1,
         img: maps[i]['img'],
         idU: maps[i]['idU'],
       );

@@ -1,6 +1,7 @@
 // Importez les bibliothèques nécessaires
 import 'dart:async';
-import 'package:allo/UI/SignUpPage.dart';
+import 'package:allo/UI/acceuil/biensPage.dart';
+import 'package:allo/models/objet.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -35,7 +36,6 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _getSession();
-    selectUser();
     loadAnnonces();
   }
 
@@ -60,20 +60,6 @@ class _HomeState extends State<Home> {
     annoncesFuture = SupabaseDB.selectAnnonces();
     print('Annonces FININI: ${annoncesFuture}');
     setState(() {});
-  }
-
-  Future<void> selectUser() async {
-    final response = await supabase.from('utilisateur').select();
-    print('response: ${response}');
-
-    if (response == null) {
-      print(
-          'Erreur lors de la récupération de l\'utilisateur: la réponse est null');
-    } else if (response != null) {
-      print('Erreur lors de la récupération de l\'utilisateur: ');
-    } else {
-      print('Utilisateur récupéré avec succès: ${response}');
-    }
   }
 
   _selectIndexSwitch(int index) {
@@ -111,11 +97,14 @@ class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<Annonce>>? annonces;
+  List<Biens> biens = [];
+
+  _HomeScreenState();
 
   @override
   void initState() {
@@ -141,6 +130,13 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const BrouillonsPage()),
+    );
+  }
+
+  void navigateToBiens(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => BiensPage()),
     );
   }
 
@@ -177,8 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              // Mettez ici le code pour rafraîchir vos données
-              // Par exemple, vous pouvez appeler à nouveau loadAnnonces()
               loadAnnonces();
             },
           ),
@@ -206,6 +200,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ButtonSelect(
               text: "Brouillons",
               onPressed: () => navigateToBrouillon(context),
+            ),
+            ButtonSelect(
+              text: "Mes Biens",
+              onPressed: () => navigateToBiens(context),
             ),
             const Padding(
               padding: EdgeInsets.only(top: 20.0),

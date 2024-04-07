@@ -1,12 +1,11 @@
 import 'package:allo/UI/setBrouillons.dart';
 import 'package:allo/db/alloDB.dart';
 import 'package:allo/models/annonce.dart';
-import 'package:allo/models/categorie.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
 class BrouillonsPage extends StatefulWidget {
-  const BrouillonsPage({Key? key}) : super(key: key);
+  const BrouillonsPage({super.key});
 
   @override
   State<BrouillonsPage> createState() => _BrouillonsPageState();
@@ -38,20 +37,19 @@ class _BrouillonsPageState extends State<BrouillonsPage> {
             return Text('Erreur : ${snapshot.error}');
           } else if (snapshot.hasData && snapshot.data != null) {
             return GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-              ),
-              itemCount: snapshot.data!.length,
-              itemBuilder: (BuildContext context, int index) {
-                Annonce? annonce = snapshot.data![index];
-                if (annonce != null) {
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                ),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  Annonce? annonce = snapshot.data![index];
                   return GestureDetector(
                     onTap: () async {
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              UpdateAnnoncePage(annonce: annonce ),
+                              UpdateAnnoncePage(annonce: annonce),
                         ),
                       );
                       setState(() {
@@ -60,11 +58,7 @@ class _BrouillonsPageState extends State<BrouillonsPage> {
                     },
                     child: _buildContainer(annonce),
                   );
-                } else {
-                  return Container();
-                }
-              },
-            );
+                });
           } else {
             return const Text("Aucune annonce disponible");
           }

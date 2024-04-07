@@ -1,12 +1,12 @@
 class Biens {
   final int id;
-  final String libelle;
-  final String description;
-  final String img;
-  final bool pret;
-  final int idU;
+  String libelle;
+  String description;
+  String img;
+  bool pret;
+  int idU;
 
-  const Biens({
+  Biens({
     required this.id,
     required this.libelle,
     required this.description,
@@ -20,10 +20,21 @@ class Biens {
       'id': id,
       'libelle': libelle,
       'description': description,
-      "pret": pret,
+      'pret': pret ? 1 : 0, // Convert bool to int
       'img': img,
       'idU': idU,
     };
+  }
+
+  static Biens fromMap(Map<String, dynamic> map) {
+    return Biens(
+      id: map['id'],
+      libelle: map['libelle'],
+      description: map['description'],
+      pret: map['pret'] == 1, 
+      img: map['img'],
+      idU: map['idU'],
+    );
   }
 
   @override
