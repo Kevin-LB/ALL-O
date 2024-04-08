@@ -1,6 +1,7 @@
 // gererBiens.dart
 import 'package:allo/data/db/supabase.dart';
 import 'package:allo/data/models/annonce.dart';
+import 'package:allo/provider/biens_rendu_provider.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
@@ -74,22 +75,3 @@ class _GererBiensState extends State<GererBiens> {
   }
 }
 
-class BiensRendusModel extends ChangeNotifier {
-  List<int> _biensRendus = [];
-
-  List<int> get biensRendus => _biensRendus;
-
-  void addBienRendu(int id) {
-    _biensRendus.add(id);
-    notifyListeners();
-  }
-
-  void removeBienRendu(int id) {
-    _biensRendus.remove(id);
-    notifyListeners();
-  }
-
-  bool estRendu(int id) {
-    return _biensRendus.contains(id);
-  }
-}
