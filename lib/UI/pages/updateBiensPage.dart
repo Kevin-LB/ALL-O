@@ -1,8 +1,8 @@
-import 'package:allo/db/alloDB.dart';
-import 'package:allo/db/supabase.dart';
-import 'package:allo/models/objet.dart';
+import 'package:allo/data/db/alloDB.dart';
+import 'package:allo/data/db/supabase.dart';
+import 'package:allo/data/models/objet.dart';
 import 'package:flutter/material.dart';
-
+// updateBiensPage.dart
 class UpdateBiensPage extends StatefulWidget {
   final Biens biens;
 

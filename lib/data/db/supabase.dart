@@ -1,5 +1,5 @@
-import 'package:allo/models/annonce.dart';
-import 'package:allo/models/objet.dart';
+import 'package:allo/data/models/annonce.dart';
+import 'package:allo/data/models/objet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseDB {

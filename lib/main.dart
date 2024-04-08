@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_import, unused_import
-
-import 'package:allo/db/supabase.dart';
+//main.dart
+import 'package:allo/data/db/supabase.dart';
+import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -8,12 +9,13 @@ import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:provider/provider.dart';
-import 'package:allo/UI/acceuil/home.dart';
-import 'package:allo/db/alloDB.dart';
+import 'package:allo/pages/home.dart';
+import 'package:allo/data/db/alloDB.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  NotificationService().initNotification();
 
   final AllDB databaseHelper = AllDB();
 

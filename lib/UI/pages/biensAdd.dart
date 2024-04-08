@@ -1,11 +1,11 @@
 // ignore_for_file: non_constant_identifier_names, no_leading_underscores_for_local_identifiers
-
-import 'package:allo/UI/Controller/button.dart';
-import 'package:allo/UI/acceuil/home.dart';
-import 'package:allo/db/alloDB.dart';
-import 'package:allo/models/appartenirBiens.dart';
-import 'package:allo/models/categorie.dart';
-import 'package:allo/models/objet.dart';
+// biensAdd.dart
+import 'package:allo/UI/components/button.dart';
+import 'package:allo/pages/home.dart';
+import 'package:allo/data/db/alloDB.dart';
+import 'package:allo/data/models/appartenirBiens.dart';
+import 'package:allo/data/models/categorie.dart';
+import 'package:allo/data/models/objet.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -1,10 +1,10 @@
-import 'package:allo/UI/Controller/button.dart';
-import 'package:allo/UI/biensAdd.dart';
-import 'package:allo/db/alloDB.dart';
-import 'package:allo/models/objet.dart';
-import 'package:allo/UI/updateBiensPage.dart';
+import 'package:allo/UI/components/button.dart';
+import 'package:allo/UI/pages/biensAdd.dart';
+import 'package:allo/data/db/alloDB.dart';
+import 'package:allo/data/models/objet.dart';
+import 'package:allo/UI/pages/updateBiensPage.dart';
 import 'package:flutter/material.dart';
-
+// biensPage.dart
 class BiensPage extends StatefulWidget {
   BiensPage({super.key});
 

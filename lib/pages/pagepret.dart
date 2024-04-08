@@ -1,6 +1,6 @@
-import 'package:allo/db/supabase.dart';
+import 'package:allo/data/db/supabase.dart';
 import 'package:flutter/material.dart';
-
+// pagepret.dart
 class MyLoansPage extends StatefulWidget {
   @override
   _MyLoansPageState createState() => _MyLoansPageState();

@@ -1,23 +1,23 @@
 import 'dart:async';
-import 'package:allo/UI/acceuil/biensPage.dart';
-import 'package:allo/models/categorie.dart';
-import 'package:allo/models/objet.dart';
+import 'package:allo/pages/biensPage.dart';
+import 'package:allo/data/models/categorie.dart';
+import 'package:allo/data/models/objet.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:allo/UI/acceuil/brouillons.dart';
-import 'package:allo/db/supabase.dart';
-import 'package:allo/UI/Controller/bottomNavBar.dart';
-import 'package:allo/UI/Controller/button.dart';
-import 'package:allo/UI/acceuil/detailAnnonce.dart';
-import 'package:allo/UI/pageAdd.dart';
-import 'package:allo/UI/menuPage/pageMenu.dart';
+import 'package:allo/pages/brouillons.dart';
+import 'package:allo/data/db/supabase.dart';
+import 'package:allo/UI/components/bottomNavBar.dart';
+import 'package:allo/UI/components/button.dart';
+import 'package:allo/pages/detailAnnonce.dart';
+import 'package:allo/UI/pages/pageAdd.dart';
+import 'package:allo/pages/pageMenu.dart';
 import 'package:allo/UI/pageSearch.dart';
-import 'package:allo/UI/acceuil/pagepret.dart';
-import 'package:allo/UI/acceuil/settingsPage.dart';
-import 'package:allo/db/alloDB.dart';
-import 'package:allo/models/annonce.dart';
-
+import 'package:allo/pages/pagepret.dart';
+import 'package:allo/pages/settingsPage.dart';
+import 'package:allo/data/db/alloDB.dart';
+import 'package:allo/data/models/annonce.dart';
+// home.dart
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 

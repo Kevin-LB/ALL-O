@@ -1,11 +1,11 @@
-import 'package:allo/UI/calendrier.dart';
-import 'package:allo/db/supabase.dart';
-import 'package:allo/models/objet.dart';
+import 'package:allo/UI/components/calendrier.dart';
+import 'package:allo/data/db/supabase.dart';
+import 'package:allo/data/models/objet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:allo/UI/Controller/button.dart';
-import 'package:allo/models/annonce.dart';
-
+import 'package:allo/UI/components/button.dart';
+import 'package:allo/data/models/annonce.dart';
+// detailAnnonce.dart
 class DetailPage extends StatefulWidget {
   final Annonce annonce;
   DetailPage({required this.annonce});

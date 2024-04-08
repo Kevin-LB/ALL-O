@@ -1,8 +1,9 @@
+import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
-import 'package:allo/UI/Controller/button.dart';
-import 'package:allo/UI/acceuil/settingsPage.dart';
+import 'package:allo/UI/components/button.dart';
+import 'package:allo/pages/settingsPage.dart';
 import 'package:allo/UI/loginPage.dart';
-
+// pageMenu.dart
 class PageMenu extends StatefulWidget {
   const PageMenu({super.key});
 
@@ -78,6 +79,11 @@ class _PageMenuState extends State<PageMenu> {
               fontSize: 40,
               onPressed: () {
                 print("Vous avez cliqué sur Reservations");
+                NotificationService().showNotification(
+                  id: 0,
+                  title: 'Notification Title',
+                  body: 'Notification Body',
+                );
               },
             ),
             const SizedBox(height: 10),

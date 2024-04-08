@@ -1,9 +1,9 @@
-import 'package:allo/UI/setBrouillons.dart';
-import 'package:allo/db/alloDB.dart';
-import 'package:allo/models/annonce.dart';
+import 'package:allo/UI/pages/update_annonce_page.dart';
+import 'package:allo/data/db/alloDB.dart';
+import 'package:allo/data/models/annonce.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
-
+// brouillons.dart
 class BrouillonsPage extends StatefulWidget {
   const BrouillonsPage({super.key});
 

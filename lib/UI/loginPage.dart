@@ -1,10 +1,11 @@
 import 'dart:async';
+// loginPage.dart
 
-import 'package:allo/db/supabase.dart';
+import 'package:allo/data/db/supabase.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/UI/SignUpPage.dart';
-import 'package:allo/UI/acceuil/home.dart';
+import 'package:allo/pages/home.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 

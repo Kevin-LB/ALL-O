@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:allo/db/supabase.dart';
-
+import 'package:allo/data/db/supabase.dart';
+// CreationComptePage.dart
 class CreationComptePage extends StatefulWidget {
   const CreationComptePage({Key? key}) : super(key: key);
 

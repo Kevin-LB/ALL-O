@@ -1,9 +1,9 @@
-import 'package:allo/db/alloDB.dart';
-import 'package:allo/db/supabase.dart';
-import 'package:allo/models/appartenirAnnonce.dart';
+import 'package:allo/data/db/alloDB.dart';
+import 'package:allo/data/db/supabase.dart';
+import 'package:allo/data/models/appartenirAnnonce.dart';
 import 'package:flutter/material.dart';
-import 'package:allo/models/annonce.dart';
-
+import 'package:allo/data/models/annonce.dart';
+// setBrouillons.dart
 class UpdateAnnoncePage extends StatefulWidget {
   final Annonce annonce;
 

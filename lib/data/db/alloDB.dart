@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:allo/models/annonce.dart';
-import 'package:allo/models/appartenirAnnonce.dart';
-import 'package:allo/models/appartenirBiens.dart';
-import 'package:allo/models/categorie.dart';
-import 'package:allo/models/concerner.dart';
-import 'package:allo/models/objet.dart';
+import 'package:allo/data/models/annonce.dart';
+import 'package:allo/data/models/appartenirAnnonce.dart';
+import 'package:allo/data/models/appartenirBiens.dart';
+import 'package:allo/data/models/categorie.dart';
+import 'package:allo/data/models/concerner.dart';
+import 'package:allo/data/models/objet.dart';
 
 // ignore: camel_case_types
 class AllDB extends ChangeNotifier {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:allo/UI/loginPage.dart';
-
+// settingsPage.dart
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
