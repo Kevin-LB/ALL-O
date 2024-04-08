@@ -20,7 +20,7 @@ import 'package:allo/pages/settings_page.dart';
 import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/models/annonce.dart';
 
-// home.dart
+// home.dart  
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 

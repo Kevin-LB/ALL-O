@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:allo/pages/home.dart';
 import 'package:allo/data/db/alloDB.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:dcdg/dcdg.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
