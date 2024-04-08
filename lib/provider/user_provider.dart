@@ -11,8 +11,8 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  fetchUser() async {
-    _user = await SupabaseDB.selectUserById(1);
+  fetchUser(int userId) async {
+    _user = await SupabaseDB.selectUserById(userId);
     notifyListeners();
   }
 }

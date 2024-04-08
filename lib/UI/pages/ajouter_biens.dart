@@ -1,9 +1,8 @@
 // ignore_for_file: non_constant_identifier_names, no_leading_underscores_for_local_identifiers
 // biensAdd.dart
 import 'package:allo/UI/components/button.dart';
-import 'package:allo/pages/home.dart';
 import 'package:allo/data/db/alloDB.dart';
-import 'package:allo/data/models/appartenirBiens.dart';
+import 'package:allo/data/models/appartenir_biens.dart';
 import 'package:allo/data/models/categorie.dart';
 import 'package:allo/data/models/objet.dart';
 import 'package:allo/provider/user_provider.dart';

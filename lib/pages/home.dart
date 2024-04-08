@@ -12,11 +12,11 @@ import 'package:allo/pages/brouillons.dart';
 import 'package:allo/data/db/supabase.dart';
 import 'package:allo/UI/components/bottom_nav_bar.dart';
 import 'package:allo/UI/components/button.dart';
-import 'package:allo/pages/detailAnnonce.dart';
+import 'package:allo/pages/detail_annonce.dart';
 import 'package:allo/UI/pages/page_add.dart';
 import 'package:allo/pages/page_menu.dart';
 import 'package:allo/pages/page_pret.dart';
-import 'package:allo/pages/settingsPage.dart';
+import 'package:allo/pages/settings_page.dart';
 import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/models/annonce.dart';
 

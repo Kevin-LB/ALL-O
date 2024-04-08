@@ -2,7 +2,7 @@
 //main.dart
 import 'package:allo/UI/pages/gerer_biens.dart';
 import 'package:allo/data/db/supabase.dart';
-import 'package:allo/loginPage.dart';
+import 'package:allo/pages/login_page.dart';
 import 'package:allo/provider/biens_rendu_provider.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:allo/service/notif_services.dart';
@@ -29,11 +29,11 @@ Future<void> main() async {
 
     runApp(MyApp(db));
   } catch (e) {
-    print('Failed to initialize the database: $e');
+    print('Échec de l\'initialisation de la base de données : $e');
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget { 
   final Database database;
   const MyApp(this.database, {super.key});
 
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
           create: (context) => BiensRendusModel(),
         ),
         ChangeNotifierProvider(
-          create: (context) => UserProvider()..fetchUser(),
+          create: (context) => UserProvider(),
         ),
         ChangeNotifierProvider(
           create: (context) {

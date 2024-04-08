@@ -2,9 +2,10 @@ import 'package:allo/data/db/supabase.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:allo/pages/SignUpPage.dart';
+import 'package:allo/pages/inscription_page.dart';
 import 'package:allo/pages/home.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    checkUser();
   }
 
   @override
@@ -29,9 +31,25 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  Future<void> checkUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('userId');
+    bool? isLoggedIn = prefs.getBool('isLoggedIn');
+    if (isLoggedIn != null && isLoggedIn) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (userId != null) {
+        await userProvider.fetchUser(userId);
+      }
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Home()),
+        (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Obtenez une référence à UserProvider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     return Scaffold(
@@ -106,6 +124,11 @@ class _LoginPageState extends State<LoginPage> {
               if (response['success']) {
                 print("Vous êtes connecté");
                 userProvider.user = response['user'];
+
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                await prefs.setInt('userId', response['user']['idU']);
+                await prefs.setBool('isLoggedIn', true); 
+
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const Home()),

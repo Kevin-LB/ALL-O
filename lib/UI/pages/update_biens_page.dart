@@ -75,7 +75,7 @@ class _UpdateBiensPageState extends State<UpdateBiensPage> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text("Votre biens a été modifiée"),
-                        backgroundColor: Colors.yellowAccent,
+                        backgroundColor: Colors.deepPurple,
                       ),
                     );
                   }

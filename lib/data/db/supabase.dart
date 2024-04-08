@@ -330,9 +330,7 @@ class SupabaseDB {
       {required Annonce annonce, required bool etatPret, String? etat}) async {
     await supabase
         .from('biens')
-        .update({"pret": etatPret})
-        .eq("idB", annonce.idB)
-        .eq("idU", annonce.idU);
+        .update({"pret": etatPret}).eq("idB", annonce.idB);
     await supabase
         .from("preter")
         .update({"etat": etat})

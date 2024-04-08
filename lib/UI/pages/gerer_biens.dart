@@ -17,6 +17,13 @@ class GererBiens extends StatefulWidget {
 
 class _GererBiensState extends State<GererBiens> {
   List<int> biensRendus = [];
+  Map<int, List<Annonce>> annonceArendre = {};
+
+  @override
+  void initState() {
+    super.initState();
+    annonceArendre = Map.from(widget.annonceArendre);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +35,12 @@ class _GererBiensState extends State<GererBiens> {
         title: const Text('Gérer les biens'),
       ),
       body: ListView.builder(
-        itemCount: widget.annonceArendre.entries.length,
+        itemCount: annonceArendre.entries.length,
         itemBuilder: (context, index) {
-          final entry = widget.annonceArendre.entries.elementAt(index);
+          final entry = annonceArendre.entries.elementAt(index);
           final int userId = entry.key;
           final List<Annonce> annonceList = entry.value;
-          print("annonceList $annonceList");
-          print("userId $userId");
+          print("Annonce a rendre: $annonceList");
           return annonceList
                   .any((annonce) => annonce.idU == userProvider.user['idU'])
               ? ExpansionTile(
@@ -60,6 +66,7 @@ class _GererBiensState extends State<GererBiens> {
                           biensRendusModel.addBienRendu(annonce.id);
                           SupabaseDB.updatePreter(
                               annonce: annonce, etatPret: false, etat: "rendu");
+                              
                           NotificationService()
                               .showNotification(
                                   title: 'Bien rendu',
@@ -71,6 +78,11 @@ class _GererBiensState extends State<GererBiens> {
                                       title: 'Annonce a cloturée',
                                       body:
                                           'Allez cloturer l\'annonce ${annonce.libelle}')));
+                          setState(() {
+                            annonceArendre[userId] = annonceList
+                                .where((a) => a.id != annonce.id)
+                                .toList();
+                          });
                         }
                       },
                     );

@@ -3,7 +3,6 @@ import 'package:allo/data/db/supabase.dart';
 import 'package:allo/data/models/objet.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:allo/UI/components/button.dart';
 import 'package:allo/data/models/annonce.dart';
 import 'package:provider/provider.dart';
@@ -259,6 +258,7 @@ class _DetailPageState extends State<DetailPage> {
                           ajouterDansPreter(
                               aPreter, annonce, maDateSelectionnee);
                           Navigator.of(context).pop();
+                          if(aPreter.isEmpty) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(

@@ -1,12 +1,9 @@
 import 'package:allo/UI/pages/gerer_biens.dart';
 import 'package:allo/data/models/annonce.dart';
-import 'package:allo/pages/home.dart';
 import 'package:allo/UI/pages/gestion_annonce.dart';
-import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/UI/components/button.dart';
-import 'package:allo/pages/settingsPage.dart';
-import 'package:allo/loginPage.dart';
+import 'package:allo/pages/settings_page.dart';
 
 // pageMenu.dart
 class PageMenu extends StatefulWidget {

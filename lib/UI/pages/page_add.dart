@@ -4,7 +4,7 @@ import 'package:allo/UI/components/button.dart';
 import 'package:allo/pages/home.dart';
 import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/db/supabase.dart';
-import 'package:allo/data/models/appartenirAnnonce.dart';
+import 'package:allo/data/models/appartenir_annonce.dart';
 import 'package:allo/data/models/annonce.dart';
 import 'package:allo/provider/user_provider.dart';
 

@@ -1,6 +1,6 @@
 import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/db/supabase.dart';
-import 'package:allo/data/models/appartenirAnnonce.dart';
+import 'package:allo/data/models/appartenir_annonce.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/data/models/annonce.dart';
@@ -104,13 +104,12 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                               _updateFuture = AllDB()
                                   .updateAnnonce(widget.annonce)
                                   .then((_) {
-                                ajouterAnnonceAAppartenirAnnonce();
                                 Navigator.pop(context);
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Votre annonce a été modifiée"),
-                                  backgroundColor: Colors.yellowAccent,
+                                  backgroundColor: Colors.deepPurple,
                                 ),
                               );
                             }
@@ -174,20 +173,5 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
         ),
       ),
     );
-  }
-
-  Future<void> ajouterAnnonceAAppartenirAnnonce() async {
-    List<Annonce> annonces = await AllDB().annonces();
-
-    Annonce annonceAValider = annonces.first;
-
-    await SupabaseDB.insertAnnonce(
-      titre: annonceAValider.libelle,
-      description: annonceAValider.description,
-      idUser: annonceAValider.idU,
-    );
-
-    List<Annonce> annoncesSupabase = await SupabaseDB.selectAnnonces();
-    Annonce annonceInseree = annoncesSupabase.first;
   }
 }

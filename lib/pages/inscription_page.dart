@@ -1,11 +1,12 @@
-import 'package:allo/loginPage.dart';
+import 'package:allo/pages/login_page.dart';
 import 'package:allo/pages/home.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/data/db/supabase.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 // CreationComptePage.dart
 class CreationComptePage extends StatefulWidget {
@@ -173,6 +174,11 @@ class _CreationComptePageState extends State<CreationComptePage> {
             ),
           );
           print("NEW USER INSERTE: $newUser");
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('userId', newUser['idU']);
+          await prefs.setBool('isLoggedIn', true);
+
           Provider.of<UserProvider>(context, listen: false).user = newUser;
           Navigator.pushAndRemoveUntil(
             context,
