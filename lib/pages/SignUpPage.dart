@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:allo/data/db/supabase.dart';
+
 // CreationComptePage.dart
 class CreationComptePage extends StatefulWidget {
   const CreationComptePage({Key? key}) : super(key: key);
@@ -123,24 +124,19 @@ class _CreationComptePageState extends State<CreationComptePage> {
         _surnameController.text.isNotEmpty &&
         _nameController.text.isNotEmpty &&
         _usernameController.text.isNotEmpty) {
-
-          print('email: ${_emailController.text}');
+      print('email: ${_emailController.text}');
 
       try {
-        print('test verifyUser');
-        final response = await SupabaseDB.verifyUser(
-          _emailController.text,
-          _usernameController.text,
+        final response = await SupabaseDB.verifyUserInscrit(
+          _emailController.text.trim(),
+          _usernameController.text.trim(),
         );
 
         if (response['success'] == false) {
-          print("L'utilisateur existe déjà");
-          sm.showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                "L'utilisateur existe déjà",
-                style: TextStyle(color: Colors.red),
-              ),
+              content: Text("L'utilisateur existe déjà"),
+              backgroundColor: Colors.red,
             ),
           );
         } else {
@@ -152,10 +148,10 @@ class _CreationComptePageState extends State<CreationComptePage> {
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
           );
-
-          sm.showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("L'utilisateur est inscrit avec succès"),
+              backgroundColor: Colors.green,
             ),
           );
         }
@@ -168,12 +164,10 @@ class _CreationComptePageState extends State<CreationComptePage> {
         );
       }
     } else {
-      sm.showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            "Veuillez remplir tous les champs",
-            style: TextStyle(color: Colors.red),
-          ),
+          content: Text("Veuillez remplir tous les champs"),
+          backgroundColor: Colors.red,
         ),
       );
     }

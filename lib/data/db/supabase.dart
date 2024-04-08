@@ -39,7 +39,11 @@ class SupabaseDB {
   static Future<Map<String, dynamic>> verifyUser(
       String email, String password) async {
     try {
-      final query = supabase.from('utilisateur').select().eq('email', email).eq('password', password);
+      final query = supabase
+          .from('utilisateur')
+          .select()
+          .eq('email', email)
+          .eq('password', password);
 
       final response = await query;
 
@@ -53,7 +57,8 @@ class SupabaseDB {
         return {'success': true, 'user': users.first};
       }
     } catch (error) {
-      print('Erreur lors de la vérification de l\'utilisateur: $error');
+      print(
+          'Erreur lors de la vérification la connexion de l\'utilisateur: $error');
       return {'success': false};
     }
   }
@@ -61,29 +66,26 @@ class SupabaseDB {
   static Future<Map<String, dynamic>> verifyUserInscrit(
       String email, String username) async {
     try {
-      final query = supabase.from('utilisateur').select('email, username');
-
-      query.eq('email', email);
-      query.eq('username', username);
+      final query = supabase
+          .from('utilisateur')
+          .select()
+          .eq('email', email)
+          .eq('username', username);
 
       final response = await query;
 
-      if (response == null) {
-        print('Erreur lors de la récupération des utilisateurs: ${response}');
-        return {'success': false};
-      }
-
       final List<Map<String, dynamic>> users = response;
-
+      print('users: $users');
       if (users.isNotEmpty) {
         print("L'email ou le nom d'utilisateur est déjà utilisé");
         return {'success': false};
       }
 
       print("L'utilisateur et l'email sont disponibles");
-      return {'success': true, 'user': users.first};
+      return {'success': true, 'user': users.isNotEmpty ? users.first : null};
     } catch (error) {
-      print('Erreur lors de la vérification de l\'utilisateur: $error');
+      print(
+          'Erreur lors de la vérification de l\'inscription de l\'utilisateur: $error');
       return {'success': false};
     }
   }
