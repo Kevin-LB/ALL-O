@@ -184,7 +184,7 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
     await SupabaseDB.insertAnnonce(
       titre: annonceAValider.libelle,
       description: annonceAValider.description,
-      idUser: annonceAValider.idU, // a modifier
+      idUser: annonceAValider.idU,
     );
 
     List<Annonce> annoncesSupabase = await SupabaseDB.selectAnnonces();

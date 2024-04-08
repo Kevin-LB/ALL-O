@@ -60,9 +60,17 @@ class _GererBiensState extends State<GererBiens> {
                           biensRendusModel.addBienRendu(annonce.id);
                           SupabaseDB.updatePreter(
                               annonce: annonce, etatPret: false, etat: "rendu");
-                          NotificationService().showNotification(
-                              title: 'Bien rendu',
-                              body: 'Le bien ${annonce.libelle} a été rendu');
+                          NotificationService()
+                              .showNotification(
+                                  title: 'Bien rendu',
+                                  body:
+                                      'Le bien ${annonce.libelle} a été rendu')
+                              .then((_) => Future.delayed(
+                                  Duration(seconds: 2),
+                                  () => NotificationService().showNotification(
+                                      title: 'Annonce a cloturée',
+                                      body:
+                                          'Allez cloturer l\'annonce ${annonce.libelle}')));
                         }
                       },
                     );
@@ -74,4 +82,3 @@ class _GererBiensState extends State<GererBiens> {
     );
   }
 }
-

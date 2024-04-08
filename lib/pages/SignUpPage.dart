@@ -1,8 +1,11 @@
+import 'package:allo/loginPage.dart';
 import 'package:allo/pages/home.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/data/db/supabase.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/gestures.dart';
+
 
 // CreationComptePage.dart
 class CreationComptePage extends StatefulWidget {
@@ -24,33 +27,46 @@ class _CreationComptePageState extends State<CreationComptePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF3C3838),
-        title: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: RichText(
-            text: const TextSpan(
-              text: "A",
-              style: TextStyle(
-                color: Color(0xff57A85A),
-                fontSize: 45.0,
+        title: Row(
+          children: [
+            RichText(
+              text: const TextSpan(
+                text: "A",
+                style: TextStyle(
+                  color: Color(0xff57A85A),
+                  fontSize: 45.0,
+                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "'llo",
+                    style: TextStyle(
+                      color: Color(0xffFFFFFF),
+                      fontSize: 30.0,
+                    ),
+                  ),
+                ],
               ),
-              children: <TextSpan>[
-                TextSpan(
-                  text: "'llo",
-                  style: TextStyle(
-                    color: Color(0xffFFFFFF),
-                    fontSize: 30.0,
-                  ),
-                ),
-                TextSpan(
-                  text: "Se connecter",
-                  style: TextStyle(
-                    color: Color(0xffFFFFFF),
-                    fontSize: 10.0,
-                  ),
-                ),
-              ],
             ),
-          ),
+            const Spacer(),
+            RichText(
+              text: TextSpan(
+                text: "Se connecter",
+                style: const TextStyle(
+                  color: Color(0xffFFFFFF),
+                  fontSize: 20.0,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()),
+                      (route) => false,
+                    );
+                  },
+              ),
+            ),
+          ],
         ),
       ),
       body: SingleChildScrollView(

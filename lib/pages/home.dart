@@ -212,11 +212,14 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }
         print("annoncesARendre: $annoncesARendre");
-        await NotificationService().showNotification(
-            id: annonce.id,
-            title: 'Fin de prêt',
-            body:
-                "Fin de prêt pour l'annonce ${annonce.libelle}, rendez vous sur gerer les biens pour faire un rendu");
+        if (annonce.idU == userProvider.user["idU"]) {
+          await NotificationService().showNotification(
+              id: annonce.id,
+              title: 'Fin de prêt',
+              body:
+                  "Fin de prêt pour l'annonce ${annonce.libelle}, rendez vous sur gerer les biens pour faire un rendu");
+        }
+
         return "Faire un rendu";
       }
       if (etatAnnonce == null) {
