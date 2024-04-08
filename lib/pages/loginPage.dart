@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:allo/data/db/supabase.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:allo/UI/SignUpPage.dart';
+import 'package:allo/pages/SignUpPage.dart';
 import 'package:allo/pages/home.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';

@@ -6,9 +6,11 @@ import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/models/appartenirBiens.dart';
 import 'package:allo/data/models/categorie.dart';
 import 'package:allo/data/models/objet.dart';
+import 'package:allo/provider/user_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class BiensAddPage extends StatefulWidget {
   @override
@@ -81,6 +83,8 @@ class _BiensAddPageState extends State<BiensAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF3C3838),
@@ -196,7 +200,7 @@ class _BiensAddPageState extends State<BiensAddPage> {
                       description: descriptionAnnonce,
                       img: 'image1.png',
                       pret: false,
-                      idU: 1,
+                      idU: userProvider.user["idU"],
                     );
                     if (selectedCategories.isNotEmpty) {
                       String category = selectedCategories.isNotEmpty
@@ -223,7 +227,7 @@ class _BiensAddPageState extends State<BiensAddPage> {
                       description: descriptionAnnonce,
                       img: 'image1.png',
                       pret: false,
-                      idU: 1,
+                      idU: userProvider.user["idU"],
                     );
                     await allDb.insertBiens(bienInsert);
                     if (mounted) {

@@ -1,6 +1,8 @@
 // ignore_for_file: unnecessary_import, unused_import
 //main.dart
+import 'package:allo/UI/pages/gerer_biens.dart';
 import 'package:allo/data/db/supabase.dart';
+import 'package:allo/provider/user_provider.dart';
 import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -20,8 +22,9 @@ Future<void> main() async {
   final AllDB databaseHelper = AllDB();
 
   try {
-    SupabaseDB.init();
+    await SupabaseDB.init();
     final db = await databaseHelper.initDb();
+
     runApp(MyApp(db));
   } catch (e) {
     print('Failed to initialize the database: $e');
@@ -37,7 +40,13 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) {
+          create: (context) => BiensRendusModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserProvider()..fetchUser(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) {
             AllDB userViewModel = AllDB();
             userViewModel.refreshAll();
             return userViewModel;
@@ -47,7 +56,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Magic Number',
+        title: 'Allo',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch()
               .copyWith(background: const Color(0xFF3C3838)),

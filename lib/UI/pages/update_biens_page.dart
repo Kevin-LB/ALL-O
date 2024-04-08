@@ -1,7 +1,10 @@
 import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/db/supabase.dart';
 import 'package:allo/data/models/objet.dart';
+import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 // updateBiensPage.dart
 class UpdateBiensPage extends StatefulWidget {
   final Biens biens;
@@ -28,6 +31,7 @@ class _UpdateBiensPageState extends State<UpdateBiensPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Modifier Biens'),
@@ -59,7 +63,7 @@ class _UpdateBiensPageState extends State<UpdateBiensPage> {
                 },
               ),
               ElevatedButton(
-                child: const Text('Soumettre'),
+                child: const Text('Modifier Biens'),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     widget.biens.libelle = _titleController.text;
@@ -68,18 +72,39 @@ class _UpdateBiensPageState extends State<UpdateBiensPage> {
                     _updateFuture = AllDB()
                         .updateBiens(widget.biens)
                         .then((value) => Navigator.pop(context));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Votre biens a été modifiée"),
+                        backgroundColor: Colors.yellowAccent,
+                      ),
+                    );
                   }
                 },
               ),
               ElevatedButton(
-                child: const Text('Envoyer à Supabase'),
+                child: const Text('Supprimer Biens'),
+                onPressed: () {
+                  _updateFuture = AllDB()
+                      .deleteBiens(widget.biens.id)
+                      .then((value) => Navigator.pop(context));
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Votre biens a été supprimée"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Publier Biens sur Allo'),
                 onPressed: () async {
-                  print('Envoi Biens à Supabase ');
+                  print('Le biens a été publiée sur Allo');
                   if (_formKey.currentState!.validate()) {
                     SupabaseDB.insertBiens(
                       titre: _titleController.text,
                       description: _descriptionController.text,
-                      idUser: widget.biens.idU,
+                      idUser: userProvider.user['idU'],
                     );
 
                     AllDB().deleteBiens(widget.biens.id);

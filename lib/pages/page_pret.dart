@@ -1,5 +1,8 @@
 import 'package:allo/data/db/supabase.dart';
+import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 // pagepret.dart
 class MyLoansPage extends StatefulWidget {
   @override
@@ -12,11 +15,15 @@ class _MyLoansPageState extends State<MyLoansPage> {
   @override
   void initState() {
     super.initState();
-    fetchLoans();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchLoans();
+    });
   }
 
   Future<void> fetchLoans() async {
-    final response = await SupabaseDB.selectBiensPreter(1);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final response =
+        await SupabaseDB.selectBiensPreter(userProvider.user['idU']);
     print('Prêts récupérés: ${response}');
 
     if (response != null) {

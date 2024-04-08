@@ -1,8 +1,11 @@
 import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/db/supabase.dart';
 import 'package:allo/data/models/appartenirAnnonce.dart';
+import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/data/models/annonce.dart';
+import 'package:provider/provider.dart';
+
 // setBrouillons.dart
 class UpdateAnnoncePage extends StatefulWidget {
   final Annonce annonce;
@@ -51,6 +54,8 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Modifier l\'annonce'),
@@ -81,8 +86,6 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                   return null;
                 },
               ),
-              Text(
-                  "Catégories de l'annonce ${listeAppartenirAnnonce.map((e) => e.idC).toList()}"),
               FutureBuilder(
                 future: _updateFuture,
                 builder: (context, snapshot) {
@@ -92,7 +95,7 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                     return Column(
                       children: [
                         ElevatedButton(
-                          child: const Text('Soumettre'),
+                          child: const Text('Modifier l\'annonce'),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               widget.annonce.libelle = _titleController.text;
@@ -104,22 +107,39 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                                 ajouterAnnonceAAppartenirAnnonce();
                                 Navigator.pop(context);
                               });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Votre annonce a été modifiée"),
+                                  backgroundColor: Colors.yellowAccent,
+                                ),
+                              );
                             }
                           },
                         ),
                         ElevatedButton(
-                          child: const Text('Envoyer à Supabase'),
+                          child:
+                              const Text('Supprimer l\'annonce du brouillons'),
                           onPressed: () async {
-                            print('Envoi à Supabase');
+                            AllDB().deleteAnnonce(widget.annonce.id);
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    "Votre annonce a été supprimée du brouillons"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          },
+                        ),
+                        ElevatedButton(
+                          child: const Text('Publier l\'annonce sur Allo'),
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              var response =
-                                  await SupabaseDB.selectBiensByIdBiens(
-                                      widget.annonce.idB);
-                              if (response.isNotEmpty) {
+                              {
                                 await SupabaseDB.insertAnnonce(
                                   titre: _titleController.text,
                                   description: _descriptionController.text,
-                                  idUser: widget.annonce.idU,
+                                  idUser: userProvider.user['idU'],
                                 ).then((idA) => {
                                       for (Appartenir_Annonce appartenirAnnonce
                                           in listeAppartenirAnnonce)
@@ -140,9 +160,6 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
                                     backgroundColor: Colors.green,
                                   ),
                                 );
-                              } else {
-                                print(
-                                    'Erreur : idBiens n\'existe pas dans la table Biens');
                               }
                             }
                           },
@@ -167,7 +184,7 @@ class _UpdateAnnoncePageState extends State<UpdateAnnoncePage> {
     await SupabaseDB.insertAnnonce(
       titre: annonceAValider.libelle,
       description: annonceAValider.description,
-      idUser: annonceAValider.idU,
+      idUser: annonceAValider.idU, // a modifier
     );
 
     List<Annonce> annoncesSupabase = await SupabaseDB.selectAnnonces();

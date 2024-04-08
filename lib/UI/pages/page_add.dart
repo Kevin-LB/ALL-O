@@ -6,9 +6,11 @@ import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/db/supabase.dart';
 import 'package:allo/data/models/appartenirAnnonce.dart';
 import 'package:allo/data/models/annonce.dart';
+import 'package:allo/provider/user_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class PageAdd extends StatefulWidget {
   @override
@@ -68,6 +70,7 @@ class _PageAddState extends State<PageAdd> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     return Scaffold(
         appBar: buildAppBar(),
         body: SingleChildScrollView(
@@ -77,7 +80,7 @@ class _PageAddState extends State<PageAdd> {
               buildAnnonceField(),
               buildDescriptionField(),
               buildCategoryField(),
-              buildValidationButton(),
+              buildValidationButton(userProvider.user['idU']),
             ],
           ),
         ));
@@ -191,13 +194,13 @@ class _PageAddState extends State<PageAdd> {
         ));
   }
 
-  Padding buildValidationButton() {
+  Padding buildValidationButton(idUser) {
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: ButtonSelect(
         text: "Valider",
         onPressed: () async {
-          await validateAndSubmit();
+          await validateAndSubmit(idUser);
         },
         buttonColor: const Color(0xFFD9D9D9),
         textColor: const Color(0xff201D1D),
@@ -205,17 +208,17 @@ class _PageAddState extends State<PageAdd> {
     );
   }
 
-  Future<void> validateAndSubmit() async {
+  Future<void> validateAndSubmit(idUser) async {
     final List<Annonce> annonceList = await allDb.annonces();
     if (annonceList.isEmpty) {
-      await insertAnnonce(1);
+      await insertAnnonce(1, idUser);
     } else {
       final id_annonce = annonceList.last.id + 1;
-      await insertAnnonce(id_annonce);
+      await insertAnnonce(id_annonce, idUser);
     }
   }
 
-  Future<void> insertAnnonce(int id_annonce) async {
+  Future<void> insertAnnonce(int id_annonce, idUser) async {
     String libelleAnnonce = _annonceController.text;
     String descriptionAnnonce = _descriptionController.text;
     final annonceInsert = Annonce(
@@ -224,16 +227,14 @@ class _PageAddState extends State<PageAdd> {
       description: descriptionAnnonce,
       datePost: DateTime.now(),
       idB: 1,
-      idU: 1,
+      idU: idUser, 
     );
     await allDb.insertAnnonce(annonceInsert);
-    print("les catégories sélectionnées: $selectedCategories");
     if (selectedCategories.isNotEmpty) {
       String categories =
           selectedCategories.isNotEmpty ? selectedCategories : '';
       for (final categorie in categories.split(', ')) {
         int idCategorie = await allDb.getCategorieId(categorie);
-        print("Test insertAppartenirAnnonce");
         await allDb.insertAppartenirAnnonce(Appartenir_Annonce(
           idA: annonceInsert.id,
           idC: idCategorie,

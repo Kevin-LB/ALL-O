@@ -71,6 +71,15 @@ class SupabaseDB {
     print('response: ${response}');
   }
 
+  static Future<Map<String, dynamic>> selectUserById(int id) async {
+    final response = await supabase
+        .from('utilisateur')
+        .select()
+        .eq('idU', id)
+        .then((value) => value[0]);
+    return response;
+  }
+
   static Future<int> insertAnnonce({
     required String titre,
     required String description,
@@ -101,6 +110,36 @@ class SupabaseDB {
       annonces.add(Annonce.fromMap(annonce));
     }
     return annonces;
+  }
+
+  static Future<List<Annonce>> selectAnnoncesByUser(int idUser) async {
+    final response = await supabase.from('annonce').select().eq('idU', idUser);
+
+    List<Annonce> annonces = [];
+    for (var annonce in response) {
+      annonces.add(Annonce.fromMap(annonce));
+    }
+    return annonces;
+  }
+
+  static Future<void> deleteAnnonce(Annonce annonce) async {
+    try {
+      await supabase.from('appartenir_annonce').delete().eq('idA', annonce.id);
+      await supabase.from('annonce').delete().eq('idA', annonce.id);
+      await supabase
+          .from('biens')
+          .update({"pret": false})
+          .eq("idB", annonce.idB)
+          .eq("idU", annonce.idU);
+      await supabase
+          .from("preter")
+          .update({"etat": "rendu"})
+          .eq("idU", annonce.idU)
+          .eq("idB", annonce.idB);
+    } catch (error) {
+      print('Erreur lors de la suppression de l\'annonce: $error');
+      rethrow;
+    }
   }
 
   static Future<void> insertAppartenirAnnonce(
@@ -253,15 +292,15 @@ class SupabaseDB {
   }
 
   static Future<void> updatePreter(
-      {required Annonce annonce, required bool etat}) async {
+      {required Annonce annonce, required bool etatPret, String? etat}) async {
     await supabase
         .from('biens')
-        .update({"pret": etat})
+        .update({"pret": etatPret})
         .eq("idB", annonce.idB)
         .eq("idU", annonce.idU);
     await supabase
         .from("preter")
-        .update({"etat": "rendu"})
+        .update({"etat": etat})
         .eq("idU", annonce.idU)
         .eq("idB", annonce.idB);
   }

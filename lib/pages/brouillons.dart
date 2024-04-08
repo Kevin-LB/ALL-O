@@ -1,4 +1,4 @@
-import 'package:allo/UI/pages/update_annonce_page.dart';
+import 'package:allo/UI/pages/update_brouillons_annonce_page.dart';
 import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/models/annonce.dart';
 import 'package:flutter/material.dart';

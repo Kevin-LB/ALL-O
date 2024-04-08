@@ -1,10 +1,13 @@
 import 'package:allo/UI/components/calendrier.dart';
 import 'package:allo/data/db/supabase.dart';
 import 'package:allo/data/models/objet.dart';
+import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:allo/UI/components/button.dart';
 import 'package:allo/data/models/annonce.dart';
+import 'package:provider/provider.dart';
+
 // detailAnnonce.dart
 class DetailPage extends StatefulWidget {
   final Annonce annonce;
@@ -22,11 +25,17 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
-    fetchBiens();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchBiens();
+    });
   }
 
   Future<void> fetchBiens() async {
-    var biens = await SupabaseDB.selectBiensByIDAnnonceNonPreter(widget.annonce.idU);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    
+    var biens =
+        await SupabaseDB.selectBiensByIDAnnonceNonPreter(userProvider.user['idU']);
     for (var bienMap in biens) {
       var bien = Biens.fromMap(bienMap);
       mesBiens.add(bien);
@@ -36,6 +45,9 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF3C3838),
@@ -131,7 +143,8 @@ class _DetailPageState extends State<DetailPage> {
                   tailleHeight: 50,
                   tailleWidth: 160,
                   fontSize: 20,
-                  onPressed: () => dialogBuilder(context, widget.annonce),
+                  onPressed: () => widget.annonce.idU == userProvider.user['idU'] ? null :
+                  dialogBuilder(context, widget.annonce),
                 ),
               ],
             )
@@ -142,11 +155,14 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> dialogBuilder(BuildContext context, Annonce annonce) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    
     return showDialog(
       context: context,
       builder: (context) {
         return FutureBuilder<List<Map<String, dynamic>>>(
-          future: SupabaseDB.selectBiensByIDAnnonceNonPreter(annonce.idU),
+          future: SupabaseDB.selectBiensByIDAnnonceNonPreter(userProvider.user['idU']),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -175,7 +191,7 @@ class _DetailPageState extends State<DetailPage> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Expanded(
                                 child: ListView.builder(
                                   shrinkWrap: true,
@@ -241,8 +257,15 @@ class _DetailPageState extends State<DetailPage> {
                           print(
                               'Biens sélectionnés: ${aPreter.map((bien) => bien.libelle).join(', ')}');
                           ajouterDansPreter(
-                              biens, annonce, maDateSelectionnee);
+                              aPreter, annonce, maDateSelectionnee);
                           Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Vous avez préter ${aPreter.map((bien) => bien.libelle).join(', ')} biens à ${annonce.libelle}'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
                         },
                         child: const Text('OK'),
                       ),
@@ -258,8 +281,8 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void ajouterDansPreter(
-      List<Biens> biens, Annonce annonce, DateTime? dateSelectionner) {
-    for (var bien in biens) {
+      List<Biens> aPreter, Annonce annonce, DateTime? dateSelectionner) {
+    for (var bien in aPreter) {
       print('Ajout de ${bien.libelle} dans la table preter');
       SupabaseDB.insertPreter(annonce, bien.id, dateSelectionner);
     }

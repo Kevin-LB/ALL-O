@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 // bottomNavBar.dart
 class CustomBottomNavBar extends StatelessWidget {
   final Function(int) onItemSelected;
@@ -18,10 +19,6 @@ class CustomBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.home_filled),
           label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: 'Search',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.add_rounded),

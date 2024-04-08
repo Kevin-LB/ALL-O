@@ -1,22 +1,25 @@
 import 'dart:async';
-import 'package:allo/pages/biensPage.dart';
+import 'package:allo/pages/biens_page.dart';
 import 'package:allo/data/models/categorie.dart';
 import 'package:allo/data/models/objet.dart';
+import 'package:allo/provider/user_provider.dart';
+import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:allo/pages/brouillons.dart';
 import 'package:allo/data/db/supabase.dart';
-import 'package:allo/UI/components/bottomNavBar.dart';
+import 'package:allo/UI/components/bottom_nav_bar.dart';
 import 'package:allo/UI/components/button.dart';
 import 'package:allo/pages/detailAnnonce.dart';
-import 'package:allo/UI/pages/pageAdd.dart';
-import 'package:allo/pages/pageMenu.dart';
-import 'package:allo/UI/pageSearch.dart';
-import 'package:allo/pages/pagepret.dart';
+import 'package:allo/UI/pages/page_add.dart';
+import 'package:allo/pages/page_menu.dart';
+import 'package:allo/pages/page_pret.dart';
 import 'package:allo/pages/settingsPage.dart';
 import 'package:allo/data/db/alloDB.dart';
 import 'package:allo/data/models/annonce.dart';
+
 // home.dart
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -24,6 +27,8 @@ class Home extends StatefulWidget {
   @override
   State<Home> createState() => _HomeState();
 }
+
+Map<int, List<Annonce>> annoncesARendre = {};
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
@@ -92,18 +97,15 @@ class _HomeState extends State<Home> {
 
   void loadAnnonces() async {
     annoncesFuture = SupabaseDB.selectAnnonces();
-    print('Annonces FININI: ${annoncesFuture}');
     setState(() {});
   }
 
   _selectIndexSwitch(int index) {
     switch (index) {
       case 1:
-        return const SearchPage();
-      case 2:
         return PageAdd();
-      case 3:
-        return const PageMenu();
+      case 2:
+        return PageMenu(annoncesArendre: annoncesARendre);
       default:
         return HomeScreen();
     }
@@ -160,7 +162,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void loadAnnonces() async {
     List<Annonce> annoncesList = await SupabaseDB.selectAnnonces();
-    print('Annonces FININI: $annoncesList');
     annonces = Future.value(annoncesList);
     for (Annonce annonce in annoncesList) {
       DateTime? datePret = await getDatePret(annonce.idB);
@@ -196,14 +197,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     Future<String> getStatusAnnonce(Annonce annonce) async {
       var etatAnnonce = await SupabaseDB.getidbfromAnnonce(annonce.id);
       DateTime? dateFinPret = await getDatePret(annonce.idB);
-      print('Etat Annonce: $etatAnnonce');
-      print('Date de prêt: $dateFinPret');
       if (dateFinPret != null && dateFinPret.isBefore(DateTime.now())) {
-        await SupabaseDB.updatePreter(annonce: annonce, etat: false);
-        return 'Cloturée';
+        if (!annoncesARendre.values
+            .expand((v) => v)
+            .any((annonceExistante) => annonceExistante.id == annonce.id)) {
+          if (!annoncesARendre.containsKey(userProvider.user["idU"])) {
+            annoncesARendre[userProvider.user["idU"]] = [annonce];
+          } else {
+            annoncesARendre[userProvider.user["idU"]]?.add(annonce);
+          }
+        }
+        print("annoncesARendre: $annoncesARendre");
+        await NotificationService().showNotification(
+            id: annonce.id,
+            title: 'Fin de prêt',
+            body:
+                "Fin de prêt pour l'annonce ${annonce.libelle}, rendez vous sur gerer les biens pour faire un rendu");
+        return "Faire un rendu";
       }
       if (etatAnnonce == null) {
         return 'Ouverte';
@@ -259,23 +273,37 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
+            const Text("Bienvenue sur Allo",
+                style: TextStyle(
+                    color: Color(0xffFFFFFF),
+                    fontSize: 30.0,
+                    fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20.0),
+            Text(
+                userProvider.user != null
+                    ? "Bonjour ${userProvider.user["prenom"]}"
+                    : "Bonjour",
+                style: const TextStyle(
+                    color: Color(0xffFFFFFF),
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20.0),
             Row(
               children: [
-              ButtonSelect(
-                text: "Mes Prêts",
-                onPressed: () => navigateToPage2(context),
-              ),
-              const SizedBox(width: 10),
-              ButtonSelect(
-                text: "Brouillons",
-                onPressed: () => navigateToBrouillon(context),
-              ),
-              const SizedBox(width: 10),
-              ButtonSelect(
-                text: "BiensB",
-                onPressed: () => navigateToBiens(context),
-              ),
+                ButtonSelect(
+                  text: "Mes Prêts",
+                  onPressed: () => navigateToPage2(context),
+                ),
+                const SizedBox(width: 10),
+                ButtonSelect(
+                  text: "Brouillons",
+                  onPressed: () => navigateToBrouillon(context),
+                ),
+                const SizedBox(width: 10),
+                ButtonSelect(
+                  text: "BIENSB",
+                  onPressed: () => navigateToBiens(context),
+                ),
               ],
             ),
             const Padding(
@@ -345,6 +373,8 @@ class _HomeScreenState extends State<HomeScreen> {
           return const Color.fromARGB(255, 137, 0, 0);
         case 'Pourvue':
           return const Color(0xFFE78138);
+        case "Faire un rendu":
+          return const Color.fromARGB(255, 75, 79, 73);
         default:
           return const Color(0xFF92D668);
       }
