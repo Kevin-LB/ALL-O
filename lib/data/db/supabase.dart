@@ -36,7 +36,30 @@ class SupabaseDB {
     }
   }
 
-  static Future<bool> verifyUser(String email, String username) async {
+  static Future<Map<String, dynamic>> verifyUser(
+      String email, String password) async {
+    try {
+      final query = supabase.from('utilisateur').select().eq('email', email).eq('password', password);
+
+      final response = await query;
+
+      final List<Map<String, dynamic>> users = response;
+      print('users: $users');
+
+      if (users.isEmpty) {
+        return {'success': false, 'user': null};
+      } else {
+        print("L'utilisateur a été trouvé");
+        return {'success': true, 'user': users.first};
+      }
+    } catch (error) {
+      print('Erreur lors de la vérification de l\'utilisateur: $error');
+      return {'success': false};
+    }
+  }
+
+  static Future<Map<String, dynamic>> verifyUserInscrit(
+      String email, String username) async {
     try {
       final query = supabase.from('utilisateur').select('email, username');
 
@@ -45,24 +68,23 @@ class SupabaseDB {
 
       final response = await query;
 
-      if (response != null) {
+      if (response == null) {
         print('Erreur lors de la récupération des utilisateurs: ${response}');
-        return false;
+        return {'success': false};
       }
 
-      final List<Map<String, dynamic>> users =
-          response as List<Map<String, dynamic>>;
+      final List<Map<String, dynamic>> users = response;
 
       if (users.isNotEmpty) {
         print("L'email ou le nom d'utilisateur est déjà utilisé");
-        return false;
+        return {'success': false};
       }
 
       print("L'utilisateur et l'email sont disponibles");
-      return true;
+      return {'success': true, 'user': users.first};
     } catch (error) {
       print('Erreur lors de la vérification de l\'utilisateur: $error');
-      return false;
+      return {'success': false};
     }
   }
 

@@ -6,7 +6,7 @@ import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/UI/components/button.dart';
 import 'package:allo/pages/settingsPage.dart';
-import 'package:allo/pages/loginPage.dart';
+import 'package:allo/loginPage.dart';
 
 // pageMenu.dart
 class PageMenu extends StatefulWidget {

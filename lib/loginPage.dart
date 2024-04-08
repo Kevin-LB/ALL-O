@@ -1,13 +1,10 @@
-import 'dart:async';
-// loginPage.dart
-
 import 'package:allo/data/db/supabase.dart';
+import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/pages/SignUpPage.dart';
 import 'package:allo/pages/home.dart';
-
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -23,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-  
   }
 
   @override
@@ -35,6 +31,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtenez une référence à UserProvider
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF3C3838),
@@ -95,46 +94,25 @@ class _LoginPageState extends State<LoginPage> {
           ),
           ElevatedButton(
             onPressed: () async {
-              try {
-                final response = await SupabaseDB.verifyUser(
-                    _emailController.text, _passwordController.text);
+              final response = await SupabaseDB.verifyUser(
+                  _emailController.text.trim(),
+                  _passwordController.text.trim());
 
-
-                if (response) {
-                  print("Vous êtes connecté");
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Home()),
-                    (route) => false,
-                  );
-                } else {
-                  print("Erreur lors de l'authentification");
-                }
-              } catch (error, stackTrace) {
-                print("l'email est: ${_emailController.text}");
-                print("le mot de passe est: ${_passwordController.text}");
-                print('Error: $error');
-                print('Stack trace: $stackTrace');
-                if (error is AuthException) {
-                  print("l'email est: ${_emailController.text}");
-                  print("le mot de passe est: ${_passwordController.text}");
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          "Une erreur s'est produite lors de l'authentification: ${error.message}"),
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                    ),
-                  );
-                } else {
-                  print("l'email est: ${_emailController.text}");
-                  print("le mot de passe est: ${_passwordController.text}");
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Mauvais email ou mot de passe"),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
+              if (response['success']) {
+                print("Vous êtes connecté");
+                userProvider.user = response['user'];
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Home()),
+                  (route) => false,
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Mauvais email ou mot de passe"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             child: const Text('Se connecter'),

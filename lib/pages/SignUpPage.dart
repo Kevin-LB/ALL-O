@@ -128,12 +128,12 @@ class _CreationComptePageState extends State<CreationComptePage> {
 
       try {
         print('test verifyUser');
-        final userExists = await SupabaseDB.verifyUser(
+        final response = await SupabaseDB.verifyUser(
           _emailController.text,
           _usernameController.text,
         );
 
-        if (userExists) {
+        if (response['success'] == false) {
           print("L'utilisateur existe déjà");
           sm.showSnackBar(
             const SnackBar(

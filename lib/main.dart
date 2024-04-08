@@ -2,6 +2,7 @@
 //main.dart
 import 'package:allo/UI/pages/gerer_biens.dart';
 import 'package:allo/data/db/supabase.dart';
+import 'package:allo/loginPage.dart';
 import 'package:allo/provider/biens_rendu_provider.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:allo/service/notif_services.dart';
@@ -62,7 +63,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSwatch()
               .copyWith(background: const Color(0xFF3C3838)),
         ),
-        home: const Home(),
+        home: const LoginPage(),
       ),
     );
   }
