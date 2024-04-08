@@ -1,0 +1,62 @@
+@startuml
+
+[*] --> AllDBIdle
+
+state AllDBIdle {
+    [*] --> NoDatabase
+    NoDatabase --> DatabaseInitialized : initDb
+}
+
+state DatabaseInitialized {
+    [*] --> NoData
+    NoData --> DataAvailable : refreshAll
+}
+
+state DataAvailable {
+    [*] --> CategorieSelected
+    CategorieSelected --> AnnonceAdded : insertAnnonce
+    CategorieSelected --> AnnonceDeleted : deleteAnnonce
+    CategorieSelected --> BiensAdded : insertBiens
+    CategorieSelected --> BiensDeleted : deleteBiens
+}
+
+state CategorieSelected {
+    [*] --> AnnonceSelected : getCategories
+    AnnonceSelected --> AnnonceDetails : getAnnonce
+    AnnonceSelected --> AnnonceUpdated : updateAnnonce
+}
+
+state AnnonceDetails {
+    [*] --> BiensSelected : fetchBiens
+    BiensSelected --> BiensDetails : selectBiens
+}
+
+state BiensDetails {
+    [*] --> BiensUpdated : updateBiens
+}
+
+state AnnonceAdded {
+    [*] --> AnnonceUpdated : updateAnnonce
+}
+
+state AnnonceDeleted {
+    [*] --> NoData : refreshAnnonces
+}
+
+state BiensAdded {
+    [*] --> BiensUpdated : updateBiens
+}
+
+state BiensDeleted {
+    [*] --> NoData : refreshBiens
+}
+
+state AnnonceUpdated {
+    [*] --> DataAvailable : refreshAnnonces
+}
+
+state BiensUpdated {
+    [*] --> DataAvailable : refreshBiens
+}
+
+@enduml

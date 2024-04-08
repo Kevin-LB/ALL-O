@@ -1,5 +1,11 @@
 // ignore_for_file: unnecessary_import, unused_import
-
+//main.dart
+import 'package:allo/UI/pages/gerer_biens.dart';
+import 'package:allo/data/db/supabase.dart';
+import 'package:allo/pages/login_page.dart';
+import 'package:allo/provider/biens_rendu_provider.dart';
+import 'package:allo/provider/user_provider.dart';
+import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -7,30 +13,28 @@ import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:provider/provider.dart';
-import 'package:allo/UI/acceuil/home.dart';
-import 'package:allo/db/alloDB.dart';
+import 'package:allo/pages/home.dart';
+import 'package:allo/data/db/alloDB.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:dcdg/dcdg.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  NotificationService().initNotification();
 
   final AllDB databaseHelper = AllDB();
 
   try {
-    await Supabase.initialize(
-        url: "https://fidkenkusmgixuzuhwit.supabase.co",
-        anonKey:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZGtlbmt1c21naXh1enVod2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNDE3NTAsImV4cCI6MjAyNTkxNzc1MH0.vbvMxUNhGCsKr9ryl6MvRlHJ-cXQb-AC7zEwUBQmH7I");
+    await SupabaseDB.init();
     final db = await databaseHelper.initDb();
+
     runApp(MyApp(db));
   } catch (e) {
-    print('Failed to initialize the database: $e');
+    print('Échec de l\'initialisation de la base de données : $e');
   }
 }
 
-final supabase = Supabase.instance.client;
-
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget { 
   final Database database;
   const MyApp(this.database, {super.key});
 
@@ -39,7 +43,13 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) {
+          create: (context) => BiensRendusModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) {
             AllDB userViewModel = AllDB();
             userViewModel.refreshAll();
             return userViewModel;
@@ -49,12 +59,12 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Magic Number',
+        title: 'Allo',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch()
               .copyWith(background: const Color(0xFF3C3838)),
         ),
-        home: const Home(),
+        home: const LoginPage(),
       ),
     );
   }

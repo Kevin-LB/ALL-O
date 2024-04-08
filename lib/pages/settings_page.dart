@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:allo/UI/loginPage.dart';
+import 'package:allo/pages/login_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+// settingsPage.dart
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -8,6 +10,18 @@ class SettingsPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
+
+  void logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
+    await prefs.setBool('isLoggedIn', false);
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
     );
   }
 
@@ -39,13 +53,13 @@ class SettingsPage extends StatelessWidget {
                 ),
                 TextButton(
                   child: const Text(
-                    'Se connecter',
+                    'Se deconnecter',
                     style: TextStyle(
                       color: Color(0xFFFFFFFF),
                     ),
                   ),
                   onPressed: () {
-                    navigateToLogin(context);
+                    logout(context);
                   },
                 ),
               ],

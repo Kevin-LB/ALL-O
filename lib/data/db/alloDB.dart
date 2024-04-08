@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:allo/models/annonce.dart';
-import 'package:allo/models/appartenirAnnonce.dart';
-import 'package:allo/models/appartenirBiens.dart';
-import 'package:allo/models/categorie.dart';
-import 'package:allo/models/concerner.dart';
-import 'package:allo/models/objet.dart';
+import 'package:allo/data/models/annonce.dart';
+import 'package:allo/data/models/appartenir_annonce.dart';
+import 'package:allo/data/models/appartenir_biens.dart';
+import 'package:allo/data/models/categorie.dart';
+import 'package:allo/data/models/concerner.dart';
+import 'package:allo/data/models/objet.dart';
 
 // ignore: camel_case_types
 class AllDB extends ChangeNotifier {
@@ -54,7 +54,6 @@ class AllDB extends ChangeNotifier {
           libelle TEXT, 
           description TEXT, 
           datePost DATETIME, 
-          img TEXT,
           idB INTEGER, 
           idU INTEGER,
           FOREIGN KEY(idB) REFERENCES Biens(id)    
@@ -197,6 +196,17 @@ class AllDB extends ChangeNotifier {
     });
   }
 
+  Future<int> getCategorieId(String libelle) async {
+    final _db = await db;
+    final List<Map<String, dynamic>> maps = await _db!
+        .query('Categorie', where: 'libelle = ?', whereArgs: [libelle]);
+    if (maps.isNotEmpty) {
+      return maps[0]['id'];
+    } else {
+      throw Exception('Aucune catégorie trouvée avec le libellé $libelle');
+    }
+  }
+
   Future<bool> annonceExists(int id) async {
     final _db = db;
     final result =
@@ -228,6 +238,38 @@ class AllDB extends ChangeNotifier {
     print(dbAnnonce);
   }
 
+  Future<void> updateAnnonce(Annonce annonce) async {
+    try {
+      final db = await _db;
+      if (db == null) {
+        print('Database is null');
+        return;
+      }
+      await db.update(
+        'Annonce',
+        annonce.toMap(),
+        where: 'id = ?',
+        whereArgs: [annonce.id],
+      );
+      print('Annonce updated');
+      notifyListeners();
+      refreshAnnonces();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> deleteAnnonce(int id) async {
+    final db = await _db;
+    await db?.delete(
+      'Annonce',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    notifyListeners();
+    refreshAnnonces();
+  }
+
   Future<bool> biensExists(int id) async {
     final _db = db;
     final result =
@@ -238,20 +280,36 @@ class AllDB extends ChangeNotifier {
 
   Future<void> insertBiens(Biens biens) async {
     final db = await _db;
-    if (await biensExists(biens.id)) {
-      await db?.update(
-        'Biens',
-        biens.toMap(),
-        where: 'id = ?',
-        whereArgs: [biens.id],
-      );
-    } else {
-      await db?.insert(
-        'Biens',
-        biens.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
+
+    await db?.insert(
+      'Biens',
+      biens.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    print("Biens inserted");
+    notifyListeners();
+    refreshBiens();
+  }
+
+  Future<void> updateBiens(Biens biens) async {
+    final db = await _db;
+    await db?.update(
+      'Biens',
+      biens.toMap(),
+      where: 'id = ?',
+      whereArgs: [biens.id],
+    );
+    notifyListeners();
+    refreshBiens();
+  }
+
+  Future<void> deleteBiens(int id) async {
+    final db = await _db;
+    await db?.delete(
+      'Biens',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
     notifyListeners();
     refreshBiens();
   }
@@ -282,6 +340,7 @@ class AllDB extends ChangeNotifier {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
+    print('Appartenir Annonce inserted');
     notifyListeners();
     refreshAppartenirAnnonces();
   }
@@ -336,7 +395,6 @@ class AllDB extends ChangeNotifier {
           libelle: maps[i]['libelle'],
           description: maps[i]['description'],
           datePost: DateTime.parse(maps[i]['datePost']),
-          img: maps[i]['img'],
           idB: maps[i]['idB'],
           idU: maps[i]['idU'],
         );
@@ -357,7 +415,6 @@ class AllDB extends ChangeNotifier {
       libelle: maps['libelle'],
       description: maps['description'],
       datePost: datePost,
-      img: maps['img'],
       idB: maps['idB'],
       idU: maps['idU'],
     );
@@ -371,7 +428,7 @@ class AllDB extends ChangeNotifier {
         id: maps[i]['id'],
         libelle: maps[i]['libelle'],
         description: maps[i]['description'],
-        pret: maps[i]['pret'],
+        pret: maps[i]['pret'] == 1,
         img: maps[i]['img'],
         idU: maps[i]['idU'],
       );
@@ -382,6 +439,19 @@ class AllDB extends ChangeNotifier {
     final db = await _db;
     final List<Map<String, dynamic>> maps =
         await db!.query('Appartenir_Annonce');
+    print("la table Appartenir_Annonce de la bdLocal : $maps");
+    return List.generate(maps.length, (i) {
+      return Appartenir_Annonce(
+        idA: maps[i]['idA'],
+        idC: maps[i]['idC'],
+      );
+    });
+  }
+
+  Future<List<Appartenir_Annonce>> appartenirAnnonceByID(int idA) async {
+    final db = await _db;
+    final List<Map<String, dynamic>> maps = await db!
+        .query('Appartenir_Annonce', where: 'idA = ?', whereArgs: [idA]);
     return List.generate(maps.length, (i) {
       return Appartenir_Annonce(
         idA: maps[i]['idA'],

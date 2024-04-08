@@ -1,10 +1,18 @@
+import 'package:allo/UI/pages/gerer_biens.dart';
+import 'package:allo/data/models/annonce.dart';
+import 'package:allo/UI/pages/gestion_annonce.dart';
 import 'package:flutter/material.dart';
-import 'package:allo/UI/Controller/button.dart';
-import 'package:allo/UI/acceuil/settingsPage.dart';
-import 'package:allo/UI/loginPage.dart';
+import 'package:allo/UI/components/button.dart';
+import 'package:allo/pages/settings_page.dart';
 
+// pageMenu.dart
 class PageMenu extends StatefulWidget {
-  const PageMenu({super.key});
+  final Map<int, List<Annonce>> annoncesArendre;
+
+  const PageMenu({
+    super.key,
+    required this.annoncesArendre,
+  });
 
   @override
   State<PageMenu> createState() => _PageMenuState();
@@ -57,27 +65,25 @@ class _PageMenuState extends State<PageMenu> {
               tailleHeight: 70,
               fontSize: 40,
               onPressed: () {
-                print("Vous avez cliqué sur Gerer mes annonces");
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const GestionAnnonce()));
               },
             ),
             const SizedBox(height: 10),
             ButtonSelect(
-              text: "Gerer mes biens",
+              text: "Gerer les biens",
               tailleWidth: 280,
               tailleHeight: 70,
               fontSize: 40,
               onPressed: () {
-                print("Vous avez cliqué sur Gerer mes biens");
-              },
-            ),
-            const SizedBox(height: 10),
-            ButtonSelect(
-              text: "Reservations",
-              tailleWidth: 280,
-              tailleHeight: 70,
-              fontSize: 40,
-              onPressed: () {
-                print("Vous avez cliqué sur Reservations");
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GererBiens(
+                              annonceArendre: widget.annoncesArendre,
+                            )));
               },
             ),
             const SizedBox(height: 10),
