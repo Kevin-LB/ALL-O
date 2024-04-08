@@ -1,0 +1,525 @@
+@startuml
+set namespaceSeparator ::
+
+class "allo::data::db::alloDB.dart::AllDB" {
+  {static} -Database? _db
+  +List<Categorie> listecategories
+  +List<Annonce> listeannonces
+  +List<Biens> listebien
+  +List<Appartenir_Annonce> listeappartenirAnnonces
+  +List<Appartenir_Biens> listeappartenirBiens
+  +dynamic db
+  +dynamic initDb()
+  +dynamic deleteDb()
+  +dynamic concernerExists()
+  +dynamic insertConcerner()
+  +dynamic concerners()
+  +dynamic categorieExists()
+  +dynamic insertCategorie()
+  +dynamic getCategories()
+  +dynamic getCategorieId()
+  +dynamic annonceExists()
+  +dynamic insertAnnonce()
+  +dynamic updateAnnonce()
+  +dynamic deleteAnnonce()
+  +dynamic biensExists()
+  +dynamic insertBiens()
+  +dynamic updateBiens()
+  +dynamic deleteBiens()
+  +dynamic appartenirAnnonceExists()
+  +dynamic insertAppartenirAnnonce()
+  +dynamic appartenirBiensExists()
+  +dynamic insertAppartenirBiens()
+  +dynamic categories()
+  +dynamic annonces()
+  +dynamic getAnnonce()
+  +dynamic biens()
+  +dynamic appartenirAnnonces()
+  +dynamic appartenirAnnonceByID()
+  +dynamic appartenirBiens()
+  +void refreshCategories()
+  +void refreshAnnonces()
+  +void refreshBiens()
+  +void refreshAppartenirAnnonces()
+  +void refreshAppartenirBiens()
+  +void refreshConcerner()
+  +void refreshAll()
+}
+
+"allo::data::db::alloDB.dart::AllDB" o-- "sqflite_common::sqlite_api.dart::Database"
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "allo::data::db::alloDB.dart::AllDB"
+
+class "allo::data::db::supabase.dart::SupabaseDB" {
+  {static} +SupabaseClient supabase
+  {static} +dynamic init()
+  {static} +dynamic insertUser()
+  {static} +dynamic verifyUser()
+  {static} +dynamic verifyUserInscrit()
+  {static} +dynamic selectUser()
+  {static} +dynamic selectUserById()
+  {static} +dynamic insertAnnonce()
+  {static} +dynamic selectAnnonces()
+  {static} +dynamic selectAnnoncesByUser()
+  {static} +dynamic deleteAnnonce()
+  {static} +dynamic insertAppartenirAnnonce()
+  {static} +dynamic selectBiens()
+  {static} +PostgrestFilterBuilder<List<Map<String, dynamic>>> selectBiensByIdBiens()
+  {static} +dynamic selectBiensByIDAnnonceNonPreter()
+  {static} +dynamic updateBiens()
+  {static} +dynamic insertBiens()
+  {static} +dynamic selectBiensNonPreter()
+  {static} +dynamic selectBiensPreter()
+  {static} +dynamic insertCategories()
+  {static} +dynamic selectCategories()
+  {static} +dynamic selectCategoriesbyId()
+  {static} +dynamic insertPreter()
+  {static} +dynamic updatePreter()
+  {static} +dynamic getidbfromAnnonce()
+  {static} +dynamic getDatePret()
+}
+
+"allo::data::db::supabase.dart::SupabaseDB" o-- "supabase::src::supabase_client.dart::SupabaseClient"
+
+class "allo::data::models::annonce.dart::Annonce" {
+  +int id
+  +String libelle
+  +String description
+  +DateTime datePost
+  +int idB
+  +int idU
+  +Map<String, Object?> toMap()
+  +String toString()
+}
+
+class "allo::data::models::appartenir_annonce.dart::Appartenir_Annonce" {
+  +int idA
+  +int idC
+  +Map<String, Object?> toMap()
+  {static} +Appartenir_Annonce fromQueryRow()
+  +String toString()
+}
+
+class "allo::data::models::appartenir_biens.dart::Appartenir_Biens" {
+  +int idB
+  +int idC
+  +Map<String, Object?> toMap()
+  +String toString()
+}
+
+class "allo::data::models::categorie.dart::Categorie" {
+  +int id
+  +String libelle
+  +Map<String, Object?> toMap()
+  +String toString()
+}
+
+class "allo::data::models::concerner.dart::Concerner" {
+  +int idA
+  +int idB
+  +Map<String, Object?> toMap()
+  +String toString()
+}
+
+class "allo::data::models::objet.dart::Biens" {
+  +int id
+  +String libelle
+  +String description
+  +String img
+  +bool pret
+  +int idU
+  +Map<String, Object?> toMap()
+  +String toString()
+}
+
+class "allo::main.dart::MyApp" {
+  +Database database
+  +Widget build()
+}
+
+"allo::main.dart::MyApp" o-- "sqflite_common::sqlite_api.dart::Database"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "allo::main.dart::MyApp"
+
+class "allo::pages::biens_page.dart::BiensPage" {
+  +State<BiensPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::biens_page.dart::BiensPage"
+
+class "allo::pages::biens_page.dart::_BiensPageState" {
+  -dynamic _biensList
+  +void initState()
+  -void _updateBiensList()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::biens_page.dart::_BiensPageState"
+
+class "allo::pages::brouillons.dart::BrouillonsPage" {
+  +State<BrouillonsPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::brouillons.dart::BrouillonsPage"
+
+class "allo::pages::brouillons.dart::_BrouillonsPageState" {
+  +dynamic db
+  +dynamic annoncesFuture
+  +void initState()
+  +Widget build()
+  -Widget _buildContainer()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::brouillons.dart::_BrouillonsPageState"
+
+class "allo::pages::detail_annonce.dart::DetailPage" {
+  +Annonce annonce
+  +State<DetailPage> createState()
+}
+
+"allo::pages::detail_annonce.dart::DetailPage" o-- "allo::data::models::annonce.dart::Annonce"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::detail_annonce.dart::DetailPage"
+
+class "allo::pages::detail_annonce.dart::_DetailPageState" {
+  +List<Biens> mesBiens
+  +List<Biens> aPreter
+  +DateTime? maDateSelectionnee
+  +void initState()
+  +dynamic fetchBiens()
+  +Widget build()
+  +dynamic dialogBuilder()
+  +void ajouterDansPreter()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::detail_annonce.dart::_DetailPageState"
+
+class "allo::pages::home.dart::Home" {
+  +State<Home> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::home.dart::Home"
+
+class "allo::pages::home.dart::_HomeState" {
+  -int _selectedIndex
+  -Session? _session
+  +dynamic annoncesFuture
+  +dynamic db
+  +SupabaseClient supabase
+  +void initState()
+  -dynamic _getSession()
+  +dynamic insertCategories()
+  +dynamic insertCategorieSupabase()
+  +void loadAnnonces()
+  -dynamic _selectIndexSwitch()
+  -void _onItemSelected()
+  +Widget build()
+}
+
+"allo::pages::home.dart::_HomeState" o-- "gotrue::src::types::session.dart::Session"
+"allo::pages::home.dart::_HomeState" o-- "supabase::src::supabase_client.dart::SupabaseClient"
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::home.dart::_HomeState"
+
+class "allo::pages::home.dart::HomeScreen" {
+  +State<HomeScreen> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::home.dart::HomeScreen"
+
+class "allo::pages::home.dart::_HomeScreenState" {
+  +dynamic annonces
+  +List<Biens> biens
+  +void initState()
+  +dynamic getDatePret()
+  +void loadAnnonces()
+  +void navigateToPage2()
+  +void navigateToBrouillon()
+  +void navigateToBiens()
+  +Widget build()
+  -Widget _buildContainer()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::home.dart::_HomeScreenState"
+
+class "allo::pages::inscription_page.dart::CreationComptePage" {
+  +State<CreationComptePage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::inscription_page.dart::CreationComptePage"
+
+class "allo::pages::inscription_page.dart::_CreationComptePageState" {
+  -TextEditingController _emailController
+  -TextEditingController _passwordController
+  -TextEditingController _surnameController
+  -TextEditingController _nameController
+  -TextEditingController _usernameController
+  +Widget build()
+  -void _registerUser()
+}
+
+"allo::pages::inscription_page.dart::_CreationComptePageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::inscription_page.dart::_CreationComptePageState"
+
+class "allo::pages::login_page.dart::LoginPage" {
+  +State<LoginPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::login_page.dart::LoginPage"
+
+class "allo::pages::login_page.dart::_LoginPageState" {
+  -TextEditingController _emailController
+  -TextEditingController _passwordController
+  +void initState()
+  +void dispose()
+  +dynamic checkUser()
+  +Widget build()
+}
+
+"allo::pages::login_page.dart::_LoginPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::login_page.dart::_LoginPageState"
+
+class "allo::pages::page_menu.dart::PageMenu" {
+  +Map<int, List<Annonce>> annoncesArendre
+  +State<PageMenu> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::page_menu.dart::PageMenu"
+
+class "allo::pages::page_menu.dart::_PageMenuState" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::page_menu.dart::_PageMenuState"
+
+class "allo::pages::page_pret.dart::MyLoansPage" {
+  +_MyLoansPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::pages::page_pret.dart::MyLoansPage"
+
+class "allo::pages::page_pret.dart::_MyLoansPageState" {
+  +List<dynamic> loans
+  +void initState()
+  +dynamic fetchLoans()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::pages::page_pret.dart::_MyLoansPageState"
+
+class "allo::pages::settings-page.dart::SettingsPage" {
+  +void navigateToLogin()
+  +void logout()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "allo::pages::settings-page.dart::SettingsPage"
+
+class "allo::pages::settings_page.dart::SettingsPage" {
+  +void navigateToLogin()
+  +void logout()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "allo::pages::settings_page.dart::SettingsPage"
+
+class "allo::provider::biens_rendu_provider.dart::BiensRendusModel" {
+  -List<int> _biensRendus
+  +List<int> biensRendus
+  +void addBienRendu()
+  +void removeBienRendu()
+  +bool estRendu()
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "allo::provider::biens_rendu_provider.dart::BiensRendusModel"
+
+class "allo::provider::user_provider.dart::UserProvider" {
+  -Map<String, dynamic> _user
+  +Map<String, dynamic> user
+  +dynamic fetchUser()
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "allo::provider::user_provider.dart::UserProvider"
+
+class "allo::service::notif_services.dart::NotificationService" {
+  +FlutterLocalNotificationsPlugin notificationsPlugin
+  +dynamic initNotification()
+  +dynamic notificationDetails()
+  +dynamic showNotification()
+}
+
+"allo::service::notif_services.dart::NotificationService" o-- "flutter_local_notifications::src::flutter_local_notifications_plugin.dart::FlutterLocalNotificationsPlugin"
+
+class "allo::UI::components::bottom_nav_bar.dart::CustomBottomNavBar" {
+  +dynamic Function(int) onItemSelected
+  +int selectedIndex
+  +Widget build()
+}
+
+"allo::UI::components::bottom_nav_bar.dart::CustomBottomNavBar" o-- "null::dynamic Function(int)"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "allo::UI::components::bottom_nav_bar.dart::CustomBottomNavBar"
+
+class "allo::UI::components::button.dart::ButtonSelect" {
+  +String text
+  +dynamic Function()? onPressed
+  +Color buttonColor
+  +Color textColor
+  +String textStyle
+  +int tailleWidth
+  +int tailleHeight
+  +int fontSize
+  +Widget build()
+}
+
+"allo::UI::components::button.dart::ButtonSelect" o-- "null::dynamic Function()"
+"allo::UI::components::button.dart::ButtonSelect" o-- "dart::ui::Color"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "allo::UI::components::button.dart::ButtonSelect"
+
+class "allo::UI::components::calendrier.dart::DateTimePickerButton" {
+  +void Function(DateTime) onDateSelected
+  +State<DateTimePickerButton> createState()
+}
+
+"allo::UI::components::calendrier.dart::DateTimePickerButton" o-- "allo::UI::components::calendrier.dart::void Function(DateTime)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::UI::components::calendrier.dart::DateTimePickerButton"
+
+class "allo::UI::components::calendrier.dart::_DateTimePickerButtonState" {
+  +DateTime? selectedDate
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::UI::components::calendrier.dart::_DateTimePickerButtonState"
+
+class "allo::UI::pages::ajouter_biens.dart::BiensAddPage" {
+  +State<BiensAddPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::UI::pages::ajouter_biens.dart::BiensAddPage"
+
+class "allo::UI::pages::ajouter_biens.dart::_BiensAddPageState" {
+  -Map<String, bool> _checkboxValues
+  +String selectedCategories
+  -TextEditingController _bienController
+  -TextEditingController _descriptionController
+  +AllDB allDb
+  +void initState()
+  +void dispose()
+  +dynamic initializeDatabase()
+  +dynamic getCategories()
+  +void onCheckboxChanged()
+  +Widget build()
+  +dynamic dialogBuilder()
+}
+
+"allo::UI::pages::ajouter_biens.dart::_BiensAddPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"allo::UI::pages::ajouter_biens.dart::_BiensAddPageState" o-- "allo::data::db::alloDB.dart::AllDB"
+"flutter::src::widgets::framework.dart::State" <|-- "allo::UI::pages::ajouter_biens.dart::_BiensAddPageState"
+
+class "allo::UI::pages::gerer_biens.dart::GererBiens" {
+  +Map<int, List<Annonce>> annonceArendre
+  +State<GererBiens> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::UI::pages::gerer_biens.dart::GererBiens"
+
+class "allo::UI::pages::gerer_biens.dart::_GererBiensState" {
+  +List<int> biensRendus
+  +Map<int, List<Annonce>> annonceArendre
+  +void initState()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::UI::pages::gerer_biens.dart::_GererBiensState"
+
+class "allo::UI::pages::gestion_annonce.dart::GestionAnnonce" {
+  +State<GestionAnnonce> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::UI::pages::gestion_annonce.dart::GestionAnnonce"
+
+class "allo::UI::pages::gestion_annonce.dart::GestionAnnonceState" {
+  +List<Annonce> annonces
+  +void initState()
+  +dynamic fetchAnnonces()
+  +dynamic deleteAnnonce()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "allo::UI::pages::gestion_annonce.dart::GestionAnnonceState"
+
+class "allo::UI::pages::page_add.dart::PageAdd" {
+  +State<PageAdd> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::UI::pages::page_add.dart::PageAdd"
+
+class "allo::UI::pages::page_add.dart::_PageAddState" {
+  -Map<String, bool> _checkboxValues
+  +String selectedCategories
+  -TextEditingController _annonceController
+  -TextEditingController _descriptionController
+  +AllDB allDb
+  +void initState()
+  +void dispose()
+  +dynamic initializeDatabase()
+  +void onCheckboxChanged()
+  +void navigateToHome()
+  +Widget build()
+  +AppBar buildAppBar()
+  +Padding buildTitle()
+  +Padding buildAnnonceField()
+  +Padding buildDescriptionField()
+  +Padding buildCategoryField()
+  +Padding buildValidationButton()
+  +dynamic validateAndSubmit()
+  +dynamic insertAnnonce()
+  +dynamic dialogBuilder()
+}
+
+"allo::UI::pages::page_add.dart::_PageAddState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"allo::UI::pages::page_add.dart::_PageAddState" o-- "allo::data::db::alloDB.dart::AllDB"
+"flutter::src::widgets::framework.dart::State" <|-- "allo::UI::pages::page_add.dart::_PageAddState"
+
+class "allo::UI::pages::update_biens_page.dart::UpdateBiensPage" {
+  +Biens biens
+  +_UpdateBiensPageState createState()
+}
+
+"allo::UI::pages::update_biens_page.dart::UpdateBiensPage" o-- "allo::data::models::objet.dart::Biens"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::UI::pages::update_biens_page.dart::UpdateBiensPage"
+
+class "allo::UI::pages::update_biens_page.dart::_UpdateBiensPageState" {
+  -GlobalKey<FormState> _formKey
+  -TextEditingController _titleController
+  -TextEditingController _descriptionController
+  -dynamic _updateFuture
+  +void initState()
+  +Widget build()
+}
+
+"allo::UI::pages::update_biens_page.dart::_UpdateBiensPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"allo::UI::pages::update_biens_page.dart::_UpdateBiensPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "allo::UI::pages::update_biens_page.dart::_UpdateBiensPageState"
+
+class "allo::UI::pages::update_brouillons_annonce_page.dart::UpdateAnnoncePage" {
+  +Annonce annonce
+  +_UpdateAnnoncePageState createState()
+}
+
+"allo::UI::pages::update_brouillons_annonce_page.dart::UpdateAnnoncePage" o-- "allo::data::models::annonce.dart::Annonce"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "allo::UI::pages::update_brouillons_annonce_page.dart::UpdateAnnoncePage"
+
+class "allo::UI::pages::update_brouillons_annonce_page.dart::_UpdateAnnoncePageState" {
+  -GlobalKey<FormState> _formKey
+  -TextEditingController _titleController
+  -TextEditingController _descriptionController
+  -dynamic _updateFuture
+  +List<Appartenir_Annonce> listeAppartenirAnnonce
+  +void initState()
+  +dynamic loadAppartenirAnnonces()
+  +dynamic loadAppartenirAnnonces2()
+  +Widget build()
+}
+
+"allo::UI::pages::update_brouillons_annonce_page.dart::_UpdateAnnoncePageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"allo::UI::pages::update_brouillons_annonce_page.dart::_UpdateAnnoncePageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "allo::UI::pages::update_brouillons_annonce_page.dart::_UpdateAnnoncePageState"
+
+
+@enduml
