@@ -2,6 +2,7 @@
 //main.dart
 import 'package:allo/UI/pages/gerer_biens.dart';
 import 'package:allo/data/db/supabase.dart';
+import 'package:allo/provider/biens_rendu_provider.dart';
 import 'package:allo/provider/user_provider.dart';
 import 'package:allo/service/notif_services.dart';
 import 'package:flutter/material.dart';
