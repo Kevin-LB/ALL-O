@@ -13,7 +13,7 @@ class SupabaseDB {
 
   static final supabase = Supabase.instance.client;
 
-  static Future<void> insertUser({
+  static Future<Map<String, dynamic>> insertUser({
     required String nom,
     required String prenom,
     required String username,
@@ -30,9 +30,20 @@ class SupabaseDB {
           'email': email,
         }
       ]);
+
+      final response = await supabase
+          .from('utilisateur')
+          .select()
+          .eq('email', email)
+          .eq('password', password)
+          .eq('username', username)
+          .eq('nom', nom)
+          .eq('prenom', prenom);
+
+      return response[0];
     } catch (error) {
       print('Erreur lors de l\'insertion de l\'utilisateur: $error');
-      rethrow;
+      return {};
     }
   }
 

@@ -1,5 +1,8 @@
+import 'package:allo/pages/home.dart';
+import 'package:allo/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:allo/data/db/supabase.dart';
+import 'package:provider/provider.dart';
 
 // CreationComptePage.dart
 class CreationComptePage extends StatefulWidget {
@@ -140,8 +143,7 @@ class _CreationComptePageState extends State<CreationComptePage> {
             ),
           );
         } else {
-          print("L'utilisateur n'existe pas");
-          await SupabaseDB.insertUser(
+          final newUser = await SupabaseDB.insertUser(
             nom: _surnameController.text,
             prenom: _nameController.text,
             username: _usernameController.text.trim(),
@@ -153,6 +155,13 @@ class _CreationComptePageState extends State<CreationComptePage> {
               content: Text("L'utilisateur est inscrit avec succès"),
               backgroundColor: Colors.green,
             ),
+          );
+          print("NEW USER INSERTE: $newUser");
+          Provider.of<UserProvider>(context, listen: false).user = newUser;
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Home()),
+            (route) => false,
           );
         }
       } catch (error) {
